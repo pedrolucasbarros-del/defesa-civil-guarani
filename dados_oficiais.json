@@ -1,16 +1,16 @@
 {
-    "ultima_atualizacao": "06/11/2026 às 01:12",
+    "ultima_atualizacao": "06/11/2026 às 01:18",
     "simge": {
-        "data_extracao": "06/11/2026 às 01:12",
-        "texto_boletim": "Hoje será mais um dia tórrido no estado de Minas Gerais. Assim como no dia de ontem, uma massa de ar quente e seca estará atuando em grande parte do estado provocando temperaturas máximas acima de 35°C nas mesorregiões: Norte, Noroeste, Vale do Jequitinhonha, Vale do Mucuri, Vale do Rio Doce, região Metropolitana, Triângulo Mineiro, Central de Minas e Zona da Mata. Cidades como januária, Montes Cl...",
+        "data_extracao": "06/11/2026 às 01:18",
+        "texto_boletim": "Hoje será mais um dia tórrido no estado de Minas Gerais. Assim como no dia de ontem, uma massa de ar quente e seca estará atuando em grande parte do estado provocando temperaturas máximas acima de 35°C nas mesorregiões: Norte, Noroeste, Vale do Jequitinhonha, Vale do Mucuri, Vale do Rio Doce, região Metropolitana, Triângulo Mineiro, Central de Minas e Zona da Mata. Cidades como januária, Montes Claros, Jequitinhonha, Governador Valadares poderão ...",
         "fonte": "SIMGE / IGAM / SEMAD-MG"
     },
     "inmet": [
         {
-            "aviso": "AVISO DE ATENÇÃO — INMET",
-            "regiao": "Zona da Mata / Bacia do Rio Pomba - MG",
-            "descricao": "Monitoramento ativo para acumulados de chuva e rajadas de vento na região.",
-            "vigencia": "Vigência Diária"
+            "aviso": "AVISO METEOROLÓGICO OFICIAL",
+            "regiao": "Guarani / Bacia do Rio Pomba - MG",
+            "descricao": "Monitoramento ativo para riscos hidrometeorológicos, volumes de precipitação acumulada e rajadas de vento na microrregião.",
+            "vigencia": "Vigência Operacional Diária"
         }
     ]
 }
