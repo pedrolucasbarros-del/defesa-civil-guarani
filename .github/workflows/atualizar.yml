@@ -1,0 +1,34 @@
+name: Atualizar Dados SIMGE e INMET
+
+on:
+  schedule:
+    # Roda automaticamente a cada 1 hora
+    - cron: '0 * * * *'
+  workflow_dispatch: # Permite rodar manualmente a qualquer momento
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar Python na Nuvem do GitHub
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar Dependências de Raspagem
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Executar Script Python
+        run: python atualizar_dados.py
+
+      - name: Salvar e Atualizar dados_oficiais.json no Repositório
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add dados_oficiais.json
+          git commit -m "Automático: Atualização dos dados oficiais" || exit 0
+          git push
