@@ -1,9 +1,16 @@
 {
     "ultima_atualizacao": "06/11/2026 às 01:03",
     "simge": {
-        "data_extracao": "06/11/2026 às 01:03",
-        "texto_boletim": "Instabilidade provocada por transporte de umidade na Zona da Mata...",
-        "fonte": "simge.mg.gov.br (IGAM / SEMAD)"
+        "data_extracao": "Quinta-feira, 5 de novembro de 2026.",
+        "texto_boletim": "Instabilidade provocada por transporte de umidade na Zona da Mata, com previsão de pancadas de chuva moderadas a fortes na bacia do Rio Pomba.",
+        "fonte": "simge.mg.gov.br (IGAM/SEMAD)"
     },
-    "inmet": []
+    "inmet": [
+        {
+            "aviso": "PERIGO POTENCIAL",
+            "regiao": "Zona da Mata MG",
+            "descricao": "Acumulado entre 20 e 30 mm/h ou até 50 mm/dia, com ventos fortes (40-60 km/h).",
+            "vigencia": "Ativa"
+        }
+    ]
 }
