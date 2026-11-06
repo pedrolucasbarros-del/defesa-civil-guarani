@@ -1,125 +1,168 @@
 {
+    "ultima_atualizacao": "06/11/2026 às 02:23",
     "status_alerta": {
         "nivel": "Normalidade",
-        "descricao": "Monitoramento ativo em Guarani. Temperatura atual de 23.1°C, com precipitação de 0.0 mm e ventos de 6.0 km/h.",
-        "temperatura": "23.1°C",
+        "descricao": "Condições atuais em Guarani: Temperatura de 22.9°C, precipitação de 0.0 mm e ventos a 4.7 km/h.",
+        "temperatura": "22.9°C",
         "precipitacao": "0.0 mm",
-        "vento": "6.0 km/h"
+        "vento": "4.7 km/h"
     },
-    "modelos": {
+    "card_geral_dia": {
+        "data": "06/11/2026",
+        "pluviometria_media": "0.0 mm",
+        "temp_max": "30 °C",
+        "temp_min": "18 °C",
+        "umid_max": "85 %",
+        "umid_min": "45 %"
+    },
+    "modelos_horarios": {
         "ecmwf": {
-            "chuva": "0.0 mm",
-            "temp": "19 / 31 °C",
-            "umid": "45 / 85 %",
-            "prob": "20 %",
-            "vento": "15.0 km/h",
-            "press": "1013 hPa"
+            "probabilidades": [
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10
+            ],
+            "chuva_7d": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
         },
         "gfs": {
-            "chuva": "0.0 mm",
-            "temp": "18 / 32 °C",
-            "umid": "40 / 80 %",
-            "prob": "25 %",
-            "vento": "22.5 km/h",
-            "press": "1012 hPa"
+            "probabilidades": [
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20
+            ],
+            "chuva_7d": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
         },
         "icon": {
-            "chuva": "0.0 mm",
-            "temp": "20 / 30 °C",
-            "umid": "50 / 90 %",
-            "prob": "15 %",
-            "vento": "18.0 km/h",
-            "press": "1014 hPa"
+            "probabilidades": [
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5,
+                5
+            ],
+            "chuva_7d": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
         },
         "media": {
-            "chuva": "0.0 mm",
-            "temp": "19 / 31 °C",
-            "umid": "45 / 85 %",
-            "prob": "20 %",
-            "vento": "20.1 km/h",
-            "press": "1013 hPa"
+            "probabilidades": [
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                10
+            ],
+            "chuva_7d": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
         }
-    },
-    "graficos": {
-        "ecmwf": [
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20
-        ],
-        "gfs": [
-            25,
-            25,
-            25,
-            25,
-            25,
-            25,
-            25,
-            25,
-            25,
-            25,
-            25,
-            25
-        ],
-        "icon": [
-            15,
-            15,
-            15,
-            15,
-            15,
-            15,
-            15,
-            15,
-            15,
-            15,
-            15,
-            15
-        ],
-        "media": [
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20,
-            20
-        ]
-    },
-    "semana": [],
-    "contatos_emergencia": [
-        {
-            "orgao": "Corpo de Bombeiros",
-            "numero": "193",
-            "descricao": "Resgate, salvamentos e combate a incêndios"
-        },
-        {
-            "orgao": "Polícia Militar",
-            "numero": "190",
-            "descricao": "Segurança pública e controle de tráfego"
-        },
-        {
-            "orgao": "SAMU",
-            "numero": "192",
-            "descricao": "Urgência e emergência médica pré-hospitalar"
-        },
-        {
-            "orgao": "Defesa Civil Municipal",
-            "numero": "Plantão Local",
-            "descricao": "Coordenação de vistorias e atendimento em Guarani"
-        }
-    ],
-    "ultima_atualizacao": "06/11/2026 às 01:59"
+    }
 }
