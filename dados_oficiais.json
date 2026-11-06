@@ -1,5 +1,5 @@
 {
-    "ultima_atualizacao": "06/11/2026 às 02:23",
+    "ultima_atualizacao": "06/11/2026 às 02:28",
     "status_alerta": {
         "nivel": "Normalidade",
         "descricao": "Condições atuais em Guarani: Temperatura de 22.9°C, precipitação de 0.0 mm e ventos a 4.7 km/h.",
@@ -12,8 +12,8 @@
         "pluviometria_media": "0.0 mm",
         "temp_max": "30 °C",
         "temp_min": "18 °C",
-        "umid_max": "85 %",
-        "umid_min": "45 %"
+        "umid_max": "90 %",
+        "umid_min": "40 %"
     },
     "modelos_horarios": {
         "ecmwf": {
@@ -44,13 +44,13 @@
                 10
             ],
             "chuva_7d": [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
             ]
         },
         "gfs": {
@@ -155,13 +155,13 @@
                 10
             ],
             "chuva_7d": [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
             ]
         }
     }
