@@ -9,7 +9,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- Header Operacional -->
+    <!-- Header -->
     <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xl">
         <div class="flex items-center space-x-3">
             <div class="bg-orange-600 p-2.5 rounded-xl text-white shadow-lg shadow-orange-600/30">
@@ -28,185 +28,153 @@
                 <button onclick="mudarAba('principal')" id="btn-aba-principal" class="px-3 py-1.5 rounded-lg font-bold transition bg-orange-600 text-white">Painel Geral</button>
                 <button onclick="mudarAba('modelos')" id="btn-aba-modelos" class="px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">Modelos Meteorológicos</button>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700/80 px-3 py-1.5 rounded-lg text-slate-300" id="relogio-operacional">
-                --:--:--
-            </div>
+            <div class="bg-slate-800/80 border border-slate-700/80 px-3 py-1.5 rounded-lg text-slate-300" id="relogio-operacional">--:--:--</div>
         </div>
     </header>
 
-    <!-- Main Container -->
     <main class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-6 flex-grow w-full">
 
         <!-- ================= ABA 1: PAINEL PRINCIPAL ================= -->
         <div id="secao-principal" class="space-y-6">
             
-            <!-- Status de Alerta Municipal -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg relative overflow-hidden">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 border-b border-slate-800 gap-4">
+            <!-- Cards Superiores: Card Geral do Dia + Estações Futuras CEMADEN / SACE -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Card Geral do Dia (Pluviometria, Temp, Umidade) -->
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-3">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Resumo Diário (Consenso)</span>
+                        <i data-lucide="calendar" class="text-orange-400 w-5 h-5"></i>
+                    </div>
                     <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Status Operacional do Município</span>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="activity" class="w-5 h-5 text-orange-500"></i> Nível de Alerta Atual para Guarani-MG
-                        </h2>
+                        <span id="geral-data" class="text-xs text-orange-400 font-mono">--/--/----</span>
+                        <div class="text-2xl font-black text-white mt-1" id="geral-pluvial">-- mm</div>
                     </div>
-                    <span id="nivel-alerta-badge" class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-600 text-white shadow-lg">
-                        Normalidade
-                    </span>
+                    <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800">
+                        <div><span class="text-slate-500 block">Temp (Mín/Máx)</span><strong id="geral-temp" class="text-slate-200">-- / --</strong></div>
+                        <div><span class="text-slate-500 block">Umid (Mín/Máx)</span><strong id="geral-umid" class="text-slate-200">-- / --</strong></div>
+                    </div>
                 </div>
 
-                <div class="py-4 text-slate-300 text-sm leading-relaxed" id="alerta-descricao">
-                    Carregando análise automatizada dos modelos meteorológicos...
+                <!-- Estação CEMADEN 01 (Futuro) -->
+                <div class="bg-slate-900 border border-slate-800/80 p-5 rounded-2xl shadow-lg space-y-3 opacity-80">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">CEMADEN — Urbana</span>
+                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">API Futura</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-300 mt-1" id="cemaden-1-val">-- mm</div>
+                    <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-800">Aguardando integração com telemetria oficial.</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800">
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] text-slate-400 block">Temperatura Atual</span>
-                            <span id="val-temperatura" class="text-lg font-bold text-amber-400">--°C</span>
-                        </div>
-                        <i data-lucide="thermometer" class="w-5 h-5 text-amber-400/50"></i>
+                <!-- Estação CEMADEN 02 (Futuro) -->
+                <div class="bg-slate-900 border border-slate-800/80 p-5 rounded-2xl shadow-lg space-y-3 opacity-80">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">CEMADEN — Encosta</span>
+                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">API Futura</span>
                     </div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] text-slate-400 block">Precipitação Prevista</span>
-                            <span id="val-precipitacao" class="text-lg font-bold text-cyan-400">-- mm</span>
-                        </div>
-                        <i data-lucide="cloud-rain" class="w-5 h-5 text-cyan-400/50"></i>
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] text-slate-400 block">Velocidade do Vento</span>
-                            <span id="val-vento" class="text-lg font-bold text-indigo-400">-- km/h</span>
-                        </div>
-                        <i data-lucide="wind" class="w-5 h-5 text-indigo-400/50"></i>
-                    </div>
+                    <div class="text-2xl font-black text-slate-300 mt-1" id="cemaden-2-val">-- mm</div>
+                    <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-800">Aguardando integração com telemetria oficial.</p>
                 </div>
+
+                <!-- Estação Fluviométrica SACE / SGB (Futuro) -->
+                <div class="bg-slate-900 border border-slate-800/80 p-5 rounded-2xl shadow-lg space-y-3 opacity-80">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">SACE / SGB — Rio Pomba</span>
+                        <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono">Fluviométrico</span>
+                    </div>
+                    <div class="text-2xl font-black text-blue-400 mt-1" id="sace-val">-- m</div>
+                    <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-800">Monitoramento de cota do rio (Aguardando API).</p>
+                </div>
+
             </div>
 
-            <!-- Contatos + Radar Windy -->
+            <!-- Central Grid: Estágio de Observação Diário + Radar Windy -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Estágio de Observação Diário (Substituindo os Contatos) -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-                            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-                                <i data-lucide="phone-call" class="w-4 h-4 text-orange-500"></i> Contatos de Emergência
-                            </h2>
-                            <span class="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full font-bold">PLANTÃO</span>
+                            <div>
+                                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">ESTÁGIO DE OBSERVAÇÃO DIÁRIO</h2>
+                                <p class="text-[11px] text-slate-400 mt-0.5">baseado na média dos modelos meteorológicos</p>
+                            </div>
+                            <span id="badge-estagio" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-600 text-white">Normalidade</span>
                         </div>
-                        <div id="grid-contatos" class="space-y-3"></div>
+                        <p id="desc-estagio" class="text-xs text-slate-300 leading-relaxed">
+                            Carregando diretrizes operacionais baseadas nos modelos...
+                        </p>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                        <div class="flex justify-between"><span>Status da Rede:</span> <strong class="text-emerald-400">Operacional</strong></div>
+                        <div class="flex justify-between"><span>Atualização Horária:</span> <strong class="text-slate-200">Ativa (GitHub Actions)</strong></div>
                     </div>
                 </div>
 
+                <!-- Radar do Windy -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 lg:col-span-2 flex flex-col space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-800">
                         <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
                             <i data-lucide="map" class="w-4 h-4 text-blue-400"></i> Geoprocessamento & Radar Windy — Guarani, MG
                         </h2>
-                        <span class="text-xs text-orange-400 font-medium flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span> Ponto de Controle Ativo
-                        </span>
                     </div>
-                    <div class="w-full h-[400px] rounded-xl border border-slate-800 overflow-hidden relative">
+                    <div class="w-full h-[350px] rounded-xl border border-slate-800 overflow-hidden relative">
                         <iframe src="https://embed.windy.com/embed2.html?lat=-21.3825&lon=-43.0811&zoom=11&level=surface&overlay=radar&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default" width="100%" height="100%" frameborder="0"></iframe>
                     </div>
                 </div>
+
             </div>
         </div>
 
         <!-- ================= ABA 2: MODELOS METEOROLÓGICOS ================= -->
         <div id="secao-modelos" class="space-y-6 hidden">
             
-            <!-- Cards dos Modelos -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg space-y-4">
-                <div class="flex justify-between items-center pb-4 border-b border-slate-800 flex-wrap gap-2">
+            <!-- Seletor de Modelo para os Gráficos -->
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-4">
+                <div class="flex justify-between items-center pb-4 border-b border-slate-800 flex-wrap gap-3">
                     <div>
                         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="cpu" class="w-5 h-5 text-indigo-400"></i> Matriz Completa de Variáveis por Modelo
+                            <i data-lucide="cpu" class="w-5 h-5 text-indigo-400"></i> Gráficos Analíticos por Modelo Meteorológico
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Previsão numérica avançada extraída via Open-Meteo (Guarani, MG)</p>
+                        <p class="text-xs text-slate-400 mt-1">Selecione o modelo desejado para visualizar as projeções</p>
+                    </div>
+                    
+                    <!-- Botões de Seleção de Modelo -->
+                    <div class="bg-slate-950 p-1 rounded-xl flex gap-1 border border-slate-800 text-xs font-mono">
+                        <button onclick="mudarModeloGrafico('ecmwf')" id="btn-ecmwf" class="px-3 py-1.5 rounded-lg font-bold transition bg-blue-600 text-white">ECMWF</button>
+                        <button onclick="mudarModeloGrafico('gfs')" id="btn-gfs" class="px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">GFS</button>
+                        <button onclick="mudarModeloGrafico('icon')" id="btn-icon" class="px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">ICON</button>
+                        <button onclick="mudarModeloGrafico('media')" id="btn-media" class="px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">Média Consenso</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                    <!-- ECMWF -->
+                <!-- Grid com os Dois Gráficos Solicitados -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+                    
+                    <!-- Gráfico 1: Probabilidade Horária (0 a 100%) para o Dia Atual -->
                     <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span class="font-bold text-blue-400 text-sm">ECMWF (Europa)</span>
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                            <span class="text-sm font-bold text-cyan-400 flex items-center gap-2">
+                                <i data-lucide="trending-up" class="w-4 h-4"></i> Probabilidade de Chuva Horária (0 - 100%)
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-mono" id="label-modelo-ativo">ECMWF</span>
                         </div>
-                        <div class="text-3xl font-black text-white" id="mod-ecmwf">-- mm</div>
-                        <div class="text-xs space-y-1.5 text-slate-300 pt-1 border-t border-slate-900">
-                            <div class="flex justify-between"><span>Temp. Máx/Mín:</span> <strong id="ecmwf-temp" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Umidade:</span> <strong id="ecmwf-umid" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Prob. Chuva:</span> <strong id="ecmwf-prob" class="text-cyan-400">--</strong></div>
-                            <div class="flex justify-between"><span>Vento:</span> <strong id="ecmwf-vento" class="text-amber-400">--</strong></div>
-                        </div>
+                        <div class="h-44 flex items-end gap-1 pt-4 pb-1" id="chart-prob-horaria"></div>
+                        <p class="text-[11px] text-slate-500">Evolução horária da probabilidade de precipitação para o dia corrente.</p>
                     </div>
-                    <!-- GFS -->
-                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span class="font-bold text-indigo-400 text-sm">GFS (EUA)</span>
-                        </div>
-                        <div class="text-3xl font-black text-white" id="mod-gfs">-- mm</div>
-                        <div class="text-xs space-y-1.5 text-slate-300 pt-1 border-t border-slate-900">
-                            <div class="flex justify-between"><span>Temp. Máx/Mín:</span> <strong id="gfs-temp" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Umidade:</span> <strong id="gfs-umid" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Prob. Chuva:</span> <strong id="gfs-prob" class="text-cyan-400">--</strong></div>
-                            <div class="flex justify-between"><span>Vento:</span> <strong id="gfs-vento" class="text-amber-400">--</strong></div>
-                        </div>
-                    </div>
-                    <!-- ICON -->
-                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span class="font-bold text-purple-400 text-sm">ICON (Alemanha)</span>
-                        </div>
-                        <div class="text-3xl font-black text-white" id="mod-icon">-- mm</div>
-                        <div class="text-xs space-y-1.5 text-slate-300 pt-1 border-t border-slate-900">
-                            <div class="flex justify-between"><span>Temp. Máx/Mín:</span> <strong id="icon-temp" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Umidade:</span> <strong id="icon-umid" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Prob. Chuva:</span> <strong id="icon-prob" class="text-cyan-400">--</strong></div>
-                            <div class="flex justify-between"><span>Vento:</span> <strong id="icon-vento" class="text-amber-400">--</strong></div>
-                        </div>
-                    </div>
-                    <!-- MÉDIA -->
-                    <div class="bg-slate-950 p-5 rounded-xl border border-orange-500/40 space-y-3 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-orange-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-bl">MÉDIA</div>
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span class="font-bold text-orange-400 text-sm">Média Ensemble</span>
-                        </div>
-                        <div class="text-3xl font-black text-orange-400" id="mod-media">-- mm</div>
-                        <div class="text-xs space-y-1.5 text-slate-300 pt-1 border-t border-slate-900">
-                            <div class="flex justify-between"><span>Média Temp:</span> <strong id="media-temp" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Média Umidade:</span> <strong id="media-umid" class="text-slate-100">--</strong></div>
-                            <div class="flex justify-between"><span>Média Prob:</span> <strong id="media-prob" class="text-orange-400">--</strong></div>
-                            <div class="flex justify-between"><span>Média Vento:</span> <strong id="media-vento" class="text-amber-400">--</strong></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Gráficos de Probabilidade por Hora -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                        <span class="text-sm font-bold text-blue-400">ECMWF — Probabilidade de Chuva %</span>
+                    <!-- Gráfico 2: Previsão de Chuva para os Próximos 7 Dias -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                            <span class="text-sm font-bold text-orange-400 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-4 h-4"></i> Acumulado de Chuva — Próximos 7 Dias
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-mono">Milímetros (mm)</span>
+                        </div>
+                        <div class="h-44 flex items-end gap-2 pt-4 pb-1" id="chart-chuva-7d"></div>
+                        <p class="text-[11px] text-slate-500">Projeção de acumulado diário para o horizonte de uma semana.</p>
                     </div>
-                    <div class="h-36 flex items-end gap-1 pt-2 pb-1" id="chart-ecmwf"></div>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                        <span class="text-sm font-bold text-indigo-400">GFS — Probabilidade de Chuva %</span>
-                    </div>
-                    <div class="h-36 flex items-end gap-1 pt-2 pb-1" id="chart-gfs"></div>
-                </div>
-            </div>
 
-            <!-- Escala Sinótica -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg space-y-4">
-                <div class="flex justify-between items-center pb-3 border-b border-slate-800">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Escala Sinótica — Ventos & Pressão Atmosférica</h3>
-                </div>
-                <div class="w-full h-[400px] rounded-xl border border-slate-800 overflow-hidden">
-                    <iframe src="https://embed.windy.com/embed2.html?lat=-21.3825&lon=-43.0811&zoom=8&level=surface&overlay=wind&menu=&message=&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default" width="100%" height="100%" frameborder="0"></iframe>
                 </div>
             </div>
 
@@ -248,96 +216,92 @@
             }
         }
 
-        function renderizarGrafico(containerId, valores) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            container.innerHTML = '';
-            valores.forEach(val => {
+        let dadosGlobais = {};
+        let modeloAtual = 'ecmwf';
+
+        function mudarModeloGrafico(modelo) {
+            modeloAtual = modelo;
+            ['ecmwf', 'gfs', 'icon', 'media'].forEach(m => {
+                const btn = document.getElementById(`btn-${m}`);
+                if (m === modelo) {
+                    btn.className = 'px-3 py-1.5 rounded-lg font-bold transition bg-blue-600 text-white';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white';
+                }
+            });
+            document.getElementById('label-modelo-ativo').innerText = modelo.toUpperCase();
+            renderizarGraficosAtuais();
+        }
+
+        function renderizarGraficosAtuais() {
+            if (!dadosGlobais.modelos_horarios) return;
+            const dadosMod = dadosGlobais.modelos_horarios[modeloAtual];
+
+            // Renderiza Probabilidade Horária (0 a 100%)
+            const containerProb = document.getElementById('chart-prob-horaria');
+            containerProb.innerHTML = '';
+            (dadosMod.probabilidades || []).forEach((val, i) => {
                 const barra = document.createElement('div');
-                barra.className = 'flex-1 bg-blue-500/80 rounded-t transition-all hover:bg-blue-400';
+                barra.className = 'flex-1 bg-cyan-500/80 rounded-t transition-all hover:bg-cyan-400 relative group';
                 barra.style.height = `${Math.max(val, 5)}%`;
-                barra.title = `${val}%`;
-                container.appendChild(barra);
+                barra.title = `${i}:00h — ${val}%`;
+                containerProb.appendChild(barra);
+            });
+
+            // Renderiza 7 Dias
+            const container7d = document.getElementById('chart-chuva-7d');
+            container7d.innerHTML = '';
+            (dadosMod.chuva_7d || []).forEach((val, i) => {
+                const barra = document.createElement('div');
+                barra.className = 'flex-1 bg-orange-500/80 rounded-t transition-all hover:bg-orange-400 relative group';
+                const alturaRelativa = Math.min(100, (val * 5)); // Escala visual proporcional
+                barra.style.height = `${Math.max(alturaRelativa, 8)}%`;
+                barra.title = `Dia +${i+1} — ${val} mm`;
+                container7d.appendChild(barra);
             });
         }
 
-        async function carregarDadosPainel() {
+        async function carregarPainel() {
             try {
                 const res = await fetch('dados_oficiais.json?t=' + new Date().getTime());
                 if (res.ok) {
-                    const dados = await res.json();
+                    dadosGlobais = await res.json();
                     
-                    if (dados.ultima_atualizacao) {
-                        document.getElementById('footer-atualizacao').innerText = `Última sincronização: ${dados.ultima_atualizacao}`;
+                    if (dadosGlobais.ultima_atualizacao) {
+                        document.getElementById('footer-atualizacao').innerText = `Última sincronização: ${dadosGlobais.ultima_atualizacao}`;
                     }
 
-                    if (dados.status_alerta) {
-                        const alerta = dados.status_alerta;
-                        document.getElementById('alerta-descricao').innerText = alerta.descricao;
-                        document.getElementById('val-temperatura').innerText = alerta.temperatura;
-                        document.getElementById('val-precipitacao').innerText = alerta.precipitacao;
-                        document.getElementById('val-vento').innerText = alerta.vento;
-
-                        const badge = document.getElementById('nivel-alerta-badge');
-                        badge.innerText = alerta.nivel;
-                        badge.className = 'px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-lg ';
-                        if (alerta.nivel === 'Normalidade') badge.classList.add('bg-emerald-600');
-                        else if (alerta.nivel === 'Atenção') badge.classList.add('bg-amber-500', 'text-slate-950');
-                        else if (alerta.nivel === 'Alerta') badge.classList.add('bg-red-600');
-                        else if (alerta.nivel === 'Alerta Máximo') badge.classList.add('bg-purple-800');
+                    // Card Geral do Dia
+                    if (dadosGlobais.card_geral_dia) {
+                        const g = dadosGlobais.card_geral_dia;
+                        document.getElementById('geral-data').innerText = g.data;
+                        document.getElementById('geral-pluvial').innerText = g.pluviometria_media;
+                        document.getElementById('geral-temp').innerText = `${g.temp_min} / ${g.temp_max}`;
+                        document.getElementById('geral-umid').innerText = `${g.umid_min} / ${g.umid_max}`;
                     }
 
-                    // Preenche Modelos (Aba 2)
-                    ['ecmwf', 'gfs', 'icon', 'media'].forEach(mod => {
-                        if (dados.modelos && dados.modelos[mod]) {
-                            const m = dados.modelos[mod];
-                            const elChuva = document.getElementById(`mod-${mod}`);
-                            if (elChuva) elChuva.innerText = m.chuva;
-                            
-                            const elTemp = document.getElementById(`${mod}-temp`);
-                            if (elTemp) elTemp.innerText = m.temp;
-
-                            const elUmid = document.getElementById(`${mod}-umid`);
-                            if (elUmid) elUmid.innerText = m.umid;
-
-                            const elProb = document.getElementById(`${mod}-prob`);
-                            if (elProb) elProb.innerText = m.prob;
-
-                            const elVento = document.getElementById(`${mod}-vento`);
-                            if (elVento) elVento.innerText = m.vento;
-                        }
-                    });
-
-                    // Renderiza Gráficos
-                    if (dados.graficos) {
-                        renderizarGrafico('chart-ecmwf', dados.graficos.ecmwf);
-                        renderizarGrafico('chart-gfs', dados.graficos.gfs);
+                    // Estágio de Observação
+                    if (dadosGlobais.status_alerta) {
+                        const st = dadosGlobais.status_alerta;
+                        document.getElementById('desc-estagio').innerText = st.descricao;
+                        const badge = document.getElementById('badge-estagio');
+                        badge.innerText = st.nivel;
+                        badge.className = 'px-3 py-1 rounded-full text-xs font-black uppercase text-white ';
+                        if (st.nivel === 'Normalidade') badge.classList.add('bg-emerald-600');
+                        else if (st.nivel === 'Atenção') badge.classList.add('bg-amber-500', 'text-slate-950');
+                        else if (st.nivel === 'Alerta') badge.classList.add('bg-red-600');
+                        else badge.classList.add('bg-purple-800');
                     }
 
-                    // Contatos
-                    if (dados.contatos_emergencia) {
-                        const grid = document.getElementById('grid-contatos');
-                        grid.innerHTML = '';
-                        dados.contatos_emergencia.forEach(c => {
-                            grid.innerHTML += `
-                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-white font-bold text-xs">${c.orgao}</span>
-                                        <span class="text-orange-400 font-mono font-black text-sm">${c.numero}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-400">${c.descricao}</p>
-                                </div>
-                            `;
-                        });
-                    }
+                    renderizarGraficosAtuais();
                 }
             } catch (err) {
                 console.error('Erro ao carregar dados:', err);
             }
         }
 
-        carregarDadosPainel();
-        setInterval(carregarDadosPainel, 300000);
+        carregarPainel();
+        setInterval(carregarPainel, 300000);
     </script>
 </body>
 </html>
