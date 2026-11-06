@@ -50,7 +50,6 @@ def gerar_dados_completos():
       chuva_atual = current.get("precipitation", 0)
       vento_atual = current.get("wind_speed_10m", 0)
 
-      # Níveis de alerta automáticos
       status = "Normalidade"
       if chuva_atual > 25 or vento_atual > 60:
         status = "Alerta Máximo"
