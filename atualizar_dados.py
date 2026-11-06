@@ -1,118 +1,118 @@
 from datetime import datetime
 import json
-from bs4 import BeautifulSoup
 import requests
 
 
-def raspar_simge():
-  url = "https://simge.mg.gov.br/previsoes-do-tempo"
-  headers = {
-      "User-Agent": (
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-      )
-  }
+def avaliar_alerta_e_clima():
+  # Coordenadas geográficas exatas de Guarani - MG
+  lat, lon = -21.29, -43.14
+  url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m"
+
+  status = "Normalidade"
+  cor = "verde"
+  descricao = (
+      "Condições meteorológicas estáveis no município. Sem riscos críticos"
+      " identificados pelos modelos."
+  )
+  temp = 0
+  chuva = 0
+  vento = 0
 
   try:
-    resposta = requests.get(url, headers=headers, timeout=15)
-    if resposta.status_code == 200:
-      soup = BeautifulSoup(resposta.text, "html.parser")
-      paragrafos = soup.find_all("p")
-      textos_validos = []
-      for p in paragrafos:
-        txt = p.get_text().strip()
-        if (
-            len(txt) > 40
-            and "Zona da Mata" in txt
-            or "Minas Gerais" in txt
-            or "temperaturas" in txt
-        ):
-          textos_validos.append(txt)
+    resp = requests.get(url, timeout=10)
+    if resp.status_code == 200:
+      data = resp.json()
+      current = data.get("current", {})
+      temp = current.get("temperature_2m", 25)
+      chuva = current.get("precipitation", 0)
+      vento = current.get("wind_speed_10m", 0)
 
-      resumo_final = (
-          " ".join(textos_validos[:2])
-          if textos_validos
-          else (
-              "Condições meteorológicas indicam variação de nebulosidade e"
-              " previsões para a Zona da Mata mineira."
-          )
-      )
-
-      return {
-          "data_extracao": datetime.now().strftime("%d/%m/%Y às %H:%M"),
-          "texto_boletim": resumo_final[:450],
-          "fonte": "SIMGE / IGAM / SEMAD-MG",
-      }
+      # Lógica refinada para os 4 níveis de alerta
+      if chuva > 25 or vento > 60:
+        status = "Alerta Máximo"
+        cor = "vermelho-escuro"
+        descricao = (
+            f"Previsão de eventos extremos severos. Precipitação de {chuva} mm"
+            f" e/ou ventos de {vento} km/h. Alto risco de ocorrências graves no"
+            " município."
+        )
+      elif chuva > 15 or vento > 45:
+        status = "Alerta"
+        cor = "vermelho"
+        descricao = (
+            f"Condições meteorológicas adversas significativas. Chuva acumulada"
+            f" de {chuva} mm ou ventos fortes de {vento} km/h."
+        )
+      elif chuva > 5 or vento > 25:
+        status = "Atenção"
+        cor = "amarelo"
+        descricao = (
+            f"Instabilidade moderada detectada. Precipitação de {chuva} mm e"
+            f" ventos de {vento} km/h. Monitoramento preventivo necessário."
+        )
+      else:
+        status = "Normalidade"
+        cor = "verde"
+        descricao = (
+            f"Tempo estável na região. Temperatura: {temp}°C, Vento:"
+            f" {vento} km/h, Chuva: {chuva} mm."
+        )
   except Exception as e:
-    print("Erro SIMGE:", e)
+    print("Erro ao consultar modelos meteorológicos:", e)
+    descricao = (
+        "Painel operando em modo de contingência para o município de"
+        " Guarani-MG."
+    )
 
   return {
-      "data_extracao": datetime.now().strftime("%d/%m/%Y às %H:%M"),
-      "texto_boletim": (
-          "Resumo das condições gerais para a Zona da Mata: Monitoramento"
-          " contínuo das previsões locais."
-      ),
-      "fonte": "SIMGE / IGAM",
+      "nivel": status,
+      "cor": cor,
+      "descricao": descricao,
+      "temperatura": f"{temp}°C",
+      "precipitacao": f"{chuva} mm",
+      "vento": f"{vento} km/h",
   }
 
 
-def raspar_inmet():
-  url_inmet = "https://apiprevmet.inmet.gov.br/alertas/JSON"
-  try:
-    resposta = requests.get(url_inmet, timeout=15)
-    if resposta.status_code == 200:
-      dados = resposta.json()
-      alertas_reais = []
-
-      # A API agrupa os avisos por ID ou Estado. Vamos varrer todas as entradas.
-      if isinstance(dados, dict):
-        for codigo, lista in dados.items():
-          if isinstance(lista, list):
-            for item in lista:
-              # Verifica se o aviso atinge Minas Gerais ou Zona da Mata
-              conteudo_str = str(item).upper()
-              if "MINAS GERAIS" in conteudo_str or "ZONA DA MATA" in conteudo_str:
-                # Extrai diretamente os campos reais que vierem da API do INMET
-                titulo_alerta = item.get("titulo", item.get("aviso", "Alerta Meteorológico"))
-                severidade = item.get("severidade", "Indefinido")
-                inicio = item.get("inicio", "")
-                fim = item.get("fim", "")
-                riscos_texto = item.get("riscos", "Sem descrição detalhada dos riscos no momento.")
-
-                alerta_formatado = {
-                    "aviso": f"Aviso de: {titulo_alerta}",
-                    "regiao": f"Grau de severidade: {severidade}",
-                    "descricao": f"Início: {inicio} | Fim: {fim}. Riscos Potenciais: {riscos_texto}",
-                    "vigencia": "Ativa"
-                }
-                alertas_reais.append(alerta_formatado)
-
-      # Se encontrou alertas reais na API, retorna eles frescos do site
-      if alertas_reais:
-        return alertas_reais[:2]
-        
-  except Exception as e:
-    print("Erro ao buscar dados reais do INMET:", e)
-
-  # Caso a API esteja totalmente fora do ar no momento da execução
-  return [{
-      "aviso": "Aviso de: Monitoramento Operacional",
-      "regiao": "Grau de severidade: Informativo",
-      "descricao": "Aguardando nova emissão de boletim oficial de alertas para a região pela rede do INMET.",
-      "vigencia": "Ativa"
-  }]
+def obter_contatos():
+  return [
+      {
+          "orgao": "Corpo de Bombeiros",
+          "numero": "193",
+          "descricao": "Resgate, salvamentos e combate a incêndios",
+      },
+      {
+          "orgao": "Polícia Militar",
+          "numero": "190",
+          "descricao": "Segurança pública e controle de tráfego",
+      },
+      {
+          "orgao": "SAMU",
+          "numero": "192",
+          "descricao": "Urgência e emergência médica pré-hospitalar",
+      },
+      {
+          "orgao": "Defesa Civil Municipal",
+          "numero": "Plantão Local",
+          "descricao": "Coordenação de vistorias e atendimento em Guarani",
+      },
+  ]
 
 
 def gerar_json_para_site():
   dados_finais = {
       "ultima_atualizacao": datetime.now().strftime("%d/%m/%Y às %H:%M"),
-      "simge": raspar_simge(),
-      "inmet": raspar_inmet(),
+      "status_alerta": avaliar_alerta_e_clima(),
+      "contatos_emergencia": obter_contatos(),
   }
 
   with open("dados_oficiais.json", "w", encoding="utf-8") as f:
     json.dump(dados_finais, f, ensure_ascii=False, indent=4)
 
-  print("JSON atualizado com dados reais da API!")
+  print(
+      "Arquivo dados_oficiais.json atualizado com a escala de 4 níveis de"
+      " alerta!"
+  )
 
 
 if __name__ == "__main__":
