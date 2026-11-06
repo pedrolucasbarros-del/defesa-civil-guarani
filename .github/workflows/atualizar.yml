@@ -1,33 +1,33 @@
-name: Atualizar Dados SIMGE e INMET
+name: Atualizar Dados Defesa Civil
 
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *' # Roda a cada 1 hora
+  workflow_dispatch: # Permite rodar manualmente na aba Actions
 
 jobs:
-  build:
+  atualizar:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permite que o bot faça commit do JSON atualizado
+
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v3
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
 
       - name: Configurar Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
       - name: Instalar Dependências
-        run: |
-          pip install requests beautifulsoup4
+        run: pip install requests
 
-      - name: Executar Script Python
+      - name: Executar Script de Atualização
         run: python atualizar_dados.py
 
-      - name: Salvar e Enviar dados_oficiais.json
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add dados_oficiais.json
-          git commit -m "Automático: Atualização do dados_oficiais.json" || echo "Sem alterações para enviar"
-          git push origin principal || git push origin main
+      - name: Enviar JSON Atualizado para o Repositório
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-atualização dos dados meteorológicos [skip ci]"
+          file_pattern: dados_oficiais.json
