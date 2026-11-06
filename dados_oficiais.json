@@ -1,16 +1,33 @@
 {
-    "ultima_atualizacao": "06/11/2026 às 01:39",
-    "simge": {
-        "data_extracao": "06/11/2026 às 01:39",
-        "texto_boletim": "Hoje será mais um dia tórrido no estado de Minas Gerais. Assim como no dia de ontem, uma massa de ar quente e seca estará atuando em grande parte do estado provocando temperaturas máximas acima de 35°C nas mesorregiões: Norte, Noroeste, Vale do Jequitinhonha, Vale do Mucuri, Vale do Rio Doce, região Metropolitana, Triângulo Mineiro, Central de Minas e Zona da Mata. Cidades como januária, Montes Claros, Jequitinhonha, Governador Valadares poderão ",
-        "fonte": "SIMGE / IGAM / SEMAD-MG"
+    "ultima_atualizacao": "06/11/2026 às 01:47",
+    "status_alerta": {
+        "nivel": "Normalidade",
+        "cor": "verde",
+        "descricao": "Tempo estável na região. Temperatura: 22.9°C, Vento: 2.7 km/h, Chuva: 0.0 mm.",
+        "temperatura": "22.9°C",
+        "precipitacao": "0.0 mm",
+        "vento": "2.7 km/h"
     },
-    "inmet": [
+    "contatos_emergencia": [
         {
-            "aviso": "Aviso de: Monitoramento Operacional",
-            "regiao": "Grau de severidade: Informativo",
-            "descricao": "Aguardando nova emissão de boletim oficial de alertas para a região pela rede do INMET.",
-            "vigencia": "Ativa"
+            "orgao": "Corpo de Bombeiros",
+            "numero": "193",
+            "descricao": "Resgate, salvamentos e combate a incêndios"
+        },
+        {
+            "orgao": "Polícia Militar",
+            "numero": "190",
+            "descricao": "Segurança pública e controle de tráfego"
+        },
+        {
+            "orgao": "SAMU",
+            "numero": "192",
+            "descricao": "Urgência e emergência médica pré-hospitalar"
+        },
+        {
+            "orgao": "Defesa Civil Municipal",
+            "numero": "Plantão Local",
+            "descricao": "Coordenação de vistorias e atendimento em Guarani"
         }
     ]
 }
