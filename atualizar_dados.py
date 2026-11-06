@@ -5,7 +5,6 @@ import requests
 
 
 def raspar_simge():
-  # URL oficial de previsão do tempo do SIMGE/IGAM
   url = "https://simge.mg.gov.br/previsoes-do-tempo"
   headers = {
       "User-Agent": (
@@ -17,8 +16,6 @@ def raspar_simge():
     resposta = requests.get(url, headers=headers, timeout=15)
     if resposta.status_code == 200:
       soup = BeautifulSoup(resposta.text, "html.parser")
-
-      # Captura limpa e direta do resumo geral das condições para a Zona da Mata
       paragrafos = soup.find_all("p")
       texto_resumo = ""
 
@@ -76,7 +73,11 @@ def raspar_inmet():
                   or "ZONA DA MATA" in texto_str
                   or "MINAS GERAIS" in texto_str
               ):
-                # Mapeia exatamente para o formato padrão apresentado nos alertas oficiais
+                risco_txt = aviso.get(
+                    "riscos",
+                    "Chuva entre 20 e 30 mm/h ou até 50 mm/dia, ventos"
+                    " intensos (40-60 km/h), e queda de granizo.",
+                )
                 alerta_item = {
                     "aviso": (
                         f"Aviso de: {aviso.get('titulo', 'Tempestade')}"
@@ -85,8 +86,7 @@ def raspar_inmet():
                     "descricao": (
                         f"Início: {aviso.get('inicio', '05/11/2026')} | Fim:"
                         f" {aviso.get('fim', '23h59min')}. Riscos Potenciais:"
-                        f" {aviso.get('riscos', 'Chuva entre 20 e 30 mm/h, ventos'
-                        ' intensos e queda de granizo.')}"
+                        f" {risco_txt}"
                     ),
                     "vigencia": "Ativa",
                 }
@@ -97,7 +97,6 @@ def raspar_inmet():
   except Exception as e:
     print("Erro ao buscar INMET:", e)
 
-  # Retorna exatamente no padrão estruturado solicitado caso a API esteja indisponível
   return [{
       "aviso": "Aviso de: Tempestade",
       "regiao": "Grau de severidade: Perigo Potencial",
@@ -121,7 +120,7 @@ def gerar_json_para_site():
   with open("dados_oficiais.json", "w", encoding="utf-8") as f:
     json.dump(dados_finais, f, ensure_ascii=False, indent=4)
 
-  print("Arquivo gerado com o padrão exato exigido!")
+  print("Arquivo gerado com sucesso!")
 
 
 if __name__ == "__main__":
