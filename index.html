@@ -3,251 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional — Defesa Civil Guarani/MG</title>
-    <style>
-        :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --border-color: #30363d;
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --accent: #58a6ff;
-            --verde: #238636;
-            --amarelo: #9e6a03;
-            --vermelho: #da3633;
-            --vermelho-escuro: #8f1d1d;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: #ffffff;
-        }
-
-        .ultima-atualizacao {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #ffffff;
-        }
-
-        /* Indicador de Status de Alerta */
-        .status-box {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: 4px;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .bg-verde { background-color: var(--verde); }
-        .bg-amarelo { background-color: var(--amarelo); }
-        .bg-vermelho { background-color: var(--vermelho); }
-        .bg-vermelho-escuro { background-color: var(--vermelho-escuro); }
-
-        .clima-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .metric-item {
-            background: #0d1117;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .metric-value {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* Lista de Contatos */
-        .contatos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .contato-card {
-            background: #0d1117;
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 6px;
-        }
-
-        .contato-orgao {
-            font-weight: bold;
-            color: #ffffff;
-            font-size: 0.95rem;
-        }
-
-        .contato-numero {
-            font-size: 1.2rem;
-            color: var(--accent);
-            margin: 5px 0;
-            font-weight: bold;
-        }
-
-        .contato-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-    </style>
+    <title>Painel Operacional — Defesa Civil de Guarani / MG</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <div class="container">
-        <header>
-            <h1>🛡️ Defesa Civil — Guarani/MG</h1>
-            <div class="ultima-atualizacao" id="atualizacao">Carregando...</div>
-        </header>
-
-        <!-- Bloco de Status de Alerta Municipal -->
-        <div class="card">
-            <div class="card-title">
-                <span>Status Operacional do Município</span>
-                <span id="nivel-badge" class="badge bg-verde">Carregando</span>
+    <!-- Header Operacional -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xl">
+        <div class="flex items-center space-x-3">
+            <div class="bg-orange-600 p-2.5 rounded-xl text-white shadow-lg shadow-orange-600/30">
+                <i data-lucide="shield-alert" class="w-7 h-7"></i>
             </div>
-            <p id="alerta-desc" style="color: var(--text-muted); line-height: 1.5; margin-bottom: 15px;">Aguardando dados dos modelos meteorológicos...</p>
+            <div>
+                <h1 class="text-xl font-black tracking-wide text-white flex items-center gap-2">
+                    DEFESA CIVIL <span class="text-orange-500">• GUARANI / MG</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-medium">Sistema Integrado de Monitoramento Meteorológico (Bacia do Rio Pomba)</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4 text-xs font-mono">
+            <!-- Navegação por Abas -->
+            <div class="bg-slate-800 p-1 rounded-xl flex gap-1 border border-slate-700">
+                <button onclick="mudarAba('principal')" id="btn-aba-principal" class="px-3 py-1.5 rounded-lg font-bold transition bg-orange-600 text-white">Painel Geral</button>
+                <button onclick="mudarAba('modelos')" id="btn-aba-modelos" class="px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">Modelos Meteorológicos</button>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/80 px-3 py-1.5 rounded-lg text-slate-300" id="relogio-operacional">
+                --:--:--
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-6 flex-grow w-full">
+
+        <!-- ================= ABA 1: PAINEL PRINCIPAL ================= -->
+        <div id="secao-principal" class="space-y-6">
             
-            <div class="clima-metrics">
-                <div class="metric-item">
-                    <div class="metric-value" id="temp-val">--</div>
-                    <div class="metric-label">Temperatura</div>
+            <!-- Bloco de Status de Alerta Municipal (Automático via Open-Meteo) -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 border-b border-slate-800 gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Status Operacional do Município</span>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="activity" class="w-5 h-5 text-orange-500"></i> Nível de Alerta Atual para Guarani-MG
+                        </h2>
+                    </div>
+                    <!-- Badge Dinâmico -->
+                    <span id="nivel-alerta-badge" class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-600 text-white shadow-lg">
+                        Normalidade
+                    </span>
                 </div>
-                <div class="metric-item">
-                    <div class="metric-value" id="chuva-val">--</div>
-                    <div class="metric-label">Previsão de Chuva</div>
+
+                <div class="py-4 text-slate-300 text-sm leading-relaxed" id="alerta-descricao">
+                    Carregando análise automatizada dos modelos meteorológicos...
                 </div>
-                <div class="metric-item">
-                    <div class="metric-value" id="vento-val">--</div>
-                    <div class="metric-label">Velocidade do Vento</div>
+
+                <!-- Métricas Rápidas do Momento -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800">
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] text-slate-400 block">Temperatura Atual</span>
+                            <span id="val-temperatura" class="text-lg font-bold text-amber-400">--°C</span>
+                        </div>
+                        <i data-lucide="thermometer" class="w-5 h-5 text-amber-400/50"></i>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] text-slate-400 block">Precipitação Prevista</span>
+                            <span id="val-precipitacao" class="text-lg font-bold text-cyan-400">-- mm</span>
+                        </div>
+                        <i data-lucide="cloud-rain" class="w-5 h-5 text-cyan-400/50"></i>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] text-slate-400 block">Velocidade do Vento</span>
+                            <span id="val-vento" class="text-lg font-bold text-indigo-400">-- km/h</span>
+                        </div>
+                        <i data-lucide="wind" class="w-5 h-5 text-indigo-400/50"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Grid: Contatos de Emergência + Radar do Windy Padrão -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Coluna Esquerda: Diretório de Contatos de Emergência -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                                <i data-lucide="phone-call" class="w-4 h-4 text-orange-500"></i> Contatos de Emergência
+                            </h2>
+                            <span class="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full font-bold">PLANTÃO</span>
+                        </div>
+                        <div id="grid-contatos" class="space-y-3">
+                            <!-- Preenchido dinamicamente via JSON -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Radar Padrão do Windy com Marcador Fixo sobre Guarani - MG -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 lg:col-span-2 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                            <i data-lucide="map" class="w-4 h-4 text-blue-400"></i> Geoprocessamento & Radar Windy — Guarani, MG
+                        </h2>
+                        <span class="text-xs text-orange-400 font-medium flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span> Ponto de Controle Ativo
+                        </span>
+                    </div>
+
+                    <!-- Radar Windy Padrão -->
+                    <div class="w-full h-[400px] rounded-xl border border-slate-800 overflow-hidden relative">
+                        <iframe 
+                            src="https://embed.windy.com/embed2.html?lat=-21.3825&lon=-43.0811&zoom=11&level=surface&overlay=radar&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default" 
+                            width="100%" 
+                            height="100%" 
+                            frameborder="0">
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= ABA 2: MODELOS METEOROLÓGICOS ================= -->
+        <div id="secao-modelos" class="space-y-6 hidden">
+            <!-- Escala Sinótica de Ventos e Pressão -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                        <i data-lucide="wind" class="w-4 h-4 text-cyan-400"></i> Escala Sinótica — Ventos & Pressão Atmosférica
+                    </h3>
+                    <span class="text-xs text-slate-400">Circulação Global do Modelo</span>
+                </div>
+                <div class="w-full h-[400px] rounded-xl border border-slate-800 overflow-hidden">
+                    <iframe 
+                        src="https://embed.windy.com/embed2.html?lat=-21.3825&lon=-43.0811&zoom=8&level=surface&overlay=wind&menu=&message=&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default" 
+                        width="100%" 
+                        height="100%" 
+                        frameborder="0">
+                    </iframe>
                 </div>
             </div>
         </div>
 
-        <!-- Bloco de Contatos de Emergência -->
-        <div class="card">
-            <div class="card-title">Diretório de Contatos de Emergência</div>
-            <div class="contatos-grid" id="grid-contatos">
-                <!-- Preenchido via JavaScript -->
-            </div>
-        </div>
-    </div>
+    </main>
 
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 px-6 py-4 text-center text-xs text-slate-500 mt-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div>Defesa Civil Municipal • Guarani / MG</div>
+        <div id="footer-atualizacao">Última sincronização: Carregando...</div>
+    </footer>
+
+    <!-- Script de Inicialização e Leitura do JSON -->
     <script>
-        async function carregarDados() {
-            try {
-                // Adiciona parâmetro de tempo para evitar cache do navegador
-                const resposta = await fetch('dados_oficiais.json?t=' + new Date().getTime());
-                if (!resposta.ok) throw new Error('Erro ao carregar dados');
-                
-                const dados = await resposta.json();
+        lucide.createIcons();
 
-                // Atualiza cabeçalho
-                document.getElementById('atualizacao').innerText = 'Atualizado em: ' + dados.ultima_atualizacao;
+        function atualizarRelogio() {
+            const agora = new Date();
+            document.getElementById('relogio-operacional').innerText = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR');
+        }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
 
-                // Atualiza Status de Alerta
-                const alerta = dados.status_alerta;
-                document.getElementById('alerta-desc').innerText = alerta.descricao;
-                document.getElementById('temp-val').innerText = alerta.temperatura;
-                document.getElementById('chuva-val').innerText = alerta.precipitacao;
-                document.getElementById('vento-val').innerText = alerta.vento;
+        function mudarAba(aba) {
+            const secPrincipal = document.getElementById('secao-principal');
+            const secModelos = document.getElementById('secao-modelos');
+            const btnPrincipal = document.getElementById('btn-aba-principal');
+            const btnModelos = document.getElementById('btn-aba-modelos');
 
-                const badge = document.getElementById('nivel-badge');
-                badge.innerText = alerta.nivel;
-                
-                // Define a cor do badge com base no nível
-                badge.className = 'badge';
-                if (alerta.nivel === 'Normalidade') badge.classList.add('bg-verde');
-                else if (alerta.nivel === 'Atenção') badge.classList.add('bg-amarelo');
-                else if (alerta.nivel === 'Alerta') badge.classList.add('bg-vermelho');
-                else if (alerta.nivel === 'Alerta Máximo') badge.classList.add('bg-vermelho-escuro');
-                else badge.classList.add('bg-verde');
-
-                // Preenche os Contatos de Emergência
-                const gridContatos = document.getElementById('grid-contatos');
-                gridContatos.innerHTML = '';
-                
-                dados.contatos_emergencia.forEach(c => {
-                    const item = document.createElement('div');
-                    item.className = 'contato-card';
-                    item.innerHTML = `
-                        <div class="contato-orgao">${c.orgao}</div>
-                        <div class="contato-numero">${c.numero}</div>
-                        <div class="contato-desc">${c.descricao}</div>
-                    `;
-                    gridContatos.appendChild(item);
-                });
-
-            } catch (erro) {
-                console.error('Erro ao atualizar painel:', erro);
-                document.getElementById('alerta-desc').innerText = 'Erro ao sincronizar informações operacionais.';
+            if (aba === 'principal') {
+                secPrincipal.classList.remove('hidden');
+                secModelos.classList.add('hidden');
+                btnPrincipal.className = 'px-3 py-1.5 rounded-lg font-bold transition bg-orange-600 text-white';
+                btnModelos.className = 'px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white';
+            } else {
+                secModelos.classList.remove('hidden');
+                secPrincipal.classList.add('hidden');
+                btnModelos.className = 'px-3 py-1.5 rounded-lg font-bold transition bg-orange-600 text-white';
+                btnPrincipal.className = 'px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white';
             }
         }
 
-        // Carrega ao iniciar e atualiza a cada 5 minutos
-        carregarDados();
-        setInterval(carregarDados, 300000);
+        async function carregarDadosPainel() {
+            try {
+                const res = await fetch('dados_oficiais.json?t=' + new Date().getTime());
+                if (res.ok) {
+                    const dados = await res.json();
+                    
+                    // Atualiza rodapé e cabeçalho com a última atualização
+                    if (dados.ultima_atualizacao) {
+                        document.getElementById('footer-atualizacao').innerText = `Última sincronização: ${dados.ultima_atualizacao}`;
+                    }
+
+                    // Atualiza Status de Alerta e Métricas
+                    if (dados.status_alerta) {
+                        const alerta = dados.status_alerta;
+                        document.getElementById('alerta-descricao').innerText = alerta.descricao;
+                        document.getElementById('val-temperatura').innerText = alerta.temperatura;
+                        document.getElementById('val-precipitacao').innerText = alerta.precipitacao;
+                        document.getElementById('val-vento').innerText = alerta.vento;
+
+                        const badge = document.getElementById('nivel-alerta-badge');
+                        badge.innerText = alerta.nivel;
+
+                        // Cores dos 4 níveis de alerta
+                        badge.className = 'px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-lg ';
+                        if (alerta.nivel === 'Normalidade') badge.classList.add('bg-emerald-600');
+                        else if (alerta.nivel === 'Atenção') badge.classList.add('bg-amber-500', 'text-slate-950');
+                        else if (alerta.nivel === 'Alerta') badge.classList.add('bg-red-600');
+                        else if (alerta.nivel === 'Alerta Máximo') badge.classList.add('bg-purple-800');
+                        else badge.classList.add('bg-emerald-600');
+                    }
+
+                    // Atualiza Contatos de Emergência
+                    if (dados.contatos_emergencia && Array.isArray(dados.contatos_emergencia)) {
+                        const grid = document.getElementById('grid-contatos');
+                        grid.innerHTML = '';
+                        dados.contatos_emergencia.forEach(c => {
+                            grid.innerHTML += `
+                                <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-white font-bold text-xs">${c.orgao}</span>
+                                        <span class="text-orange-400 font-mono font-black text-sm">${c.numero}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-400">${c.descricao}</p>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao carregar dados oficiais:', err);
+            }
+        }
+
+        carregarDadosPainel();
+        setInterval(carregarDadosPainel, 300000); // Atualiza a cada 5 minutos
     </script>
 </body>
 </html>
