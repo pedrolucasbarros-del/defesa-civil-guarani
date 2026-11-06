@@ -17,8 +17,6 @@ def raspar_simge():
     if resposta.status_code == 200:
       soup = BeautifulSoup(resposta.text, "html.parser")
       paragrafos = soup.find_all("p")
-
-      # Pega os parágrafos reais do boletim do SIMGE focados na Zona da Mata
       textos_validos = []
       for p in paragrafos:
         txt = p.get_text().strip()
@@ -30,14 +28,14 @@ def raspar_simge():
         ):
           textos_validos.append(txt)
 
-      if textos_validos:
-        resumo_final = " ".join(textos_validos[:2])
-      else:
-        resumo_final = (
-            "Condições meteorológicas indicam atuação de massa de ar na região,"
-            " com variação de nebulosidade e temperaturas características para"
-            " a Zona da Mata mineira."
-        )
+      resumo_final = (
+          " ".join(textos_validos[:2])
+          if textos_validos
+          else (
+              "Condições meteorológicas indicam variação de nebulosidade e"
+              " previsões para a Zona da Mata mineira."
+          )
+      )
 
       return {
           "data_extracao": datetime.now().strftime("%d/%m/%Y às %H:%M"),
@@ -50,8 +48,8 @@ def raspar_simge():
   return {
       "data_extracao": datetime.now().strftime("%d/%m/%Y às %H:%M"),
       "texto_boletim": (
-          "Resumo das condições gerais para a Zona da Mata: Estabilidade e"
-          " monitoramento contínuo das previsões hidrometeorológicas locais."
+          "Resumo das condições gerais para a Zona da Mata: Monitoramento"
+          " contínuo das previsões locais."
       ),
       "fonte": "SIMGE / IGAM",
   }
@@ -63,54 +61,44 @@ def raspar_inmet():
     resposta = requests.get(url_inmet, timeout=15)
     if resposta.status_code == 200:
       dados = resposta.json()
-      alertas_extraidos = []
+      alertas_reais = []
 
-      # A API do INMET organiza por chaves de estados ou códigos
+      # A API agrupa os avisos por ID ou Estado. Vamos varrer todas as entradas.
       if isinstance(dados, dict):
-        for chave, lista_avisos in dados.items():
-          if isinstance(lista_avisos, list):
-            for aviso in lista_avisos:
-              # Garante que pega os avisos ativos que mencionam Minas Gerais ou Zona da Mata
-              entidade_str = str(aviso).upper()
-              if "MINAS GERAIS" in entidade_str or "ZONA DA MATA" in entidade_str:
-                titulo = aviso.get("aviso", "Tempestade")
-                severidade = aviso.get("severidade", "Perigo Potencial")
-                inicio = aviso.get("inicio", "05/11/2026")
-                fim = aviso.get("fim", "23h59min")
-                riscos = aviso.get(
-                    "riscos",
-                    "Chuva entre 20 e 30 mm/h ou até 50 mm/dia, ventos intensos"
-                    " (40-60 km/h) e queda de granizo.",
-                )
+        for codigo, lista in dados.items():
+          if isinstance(lista, list):
+            for item in lista:
+              # Verifica se o aviso atinge Minas Gerais ou Zona da Mata
+              conteudo_str = str(item).upper()
+              if "MINAS GERAIS" in conteudo_str or "ZONA DA MATA" in conteudo_str:
+                # Extrai diretamente os campos reais que vierem da API do INMET
+                titulo_alerta = item.get("titulo", item.get("aviso", "Alerta Meteorológico"))
+                severidade = item.get("severidade", "Indefinido")
+                inicio = item.get("inicio", "")
+                fim = item.get("fim", "")
+                riscos_texto = item.get("riscos", "Sem descrição detalhada dos riscos no momento.")
 
                 alerta_formatado = {
-                    "aviso": f"Aviso de: {titulo}",
+                    "aviso": f"Aviso de: {titulo_alerta}",
                     "regiao": f"Grau de severidade: {severidade}",
-                    "descricao": (
-                        f"Início: {inicio} | Fim: {fim}. Riscos Potenciais:"
-                        f" {riscos}"
-                    ),
-                    "vigencia": "Ativa",
+                    "descricao": f"Início: {inicio} | Fim: {fim}. Riscos Potenciais: {riscos_texto}",
+                    "vigencia": "Ativa"
                 }
-                alertas_extraidos.append(alerta_formatado)
+                alertas_reais.append(alerta_formatado)
 
-      if alertas_extraidos:
-        return alertas_extraidos[:2]
+      # Se encontrou alertas reais na API, retorna eles frescos do site
+      if alertas_reais:
+        return alertas_reais[:2]
+        
   except Exception as e:
-    print("Erro INMET:", e)
+    print("Erro ao buscar dados reais do INMET:", e)
 
-  # Retorna o modelo exato idêntico ao print que você enviou caso a API esteja em intervalo de atualização
+  # Caso a API esteja totalmente fora do ar no momento da execução
   return [{
-      "aviso": "Aviso de: Tempestade",
-      "regiao": "Grau de severidade: Perigo Potencial",
-      "descricao": (
-          "Início: 05/11/2026 08h58min | Fim: 05/11/2026 23h59min. Riscos"
-          " Potenciais: Chuva entre 20 e 30 mm/h ou até 50 mm/dia, ventos"
-          " intensos (40-60 km/h), e queda de granizo. Baixo risco de corte de"
-          " energia elétrica, estragos em plantações, queda de galhos de"
-          " árvores e de alagamentos."
-      ),
-      "vigencia": "Ativa",
+      "aviso": "Aviso de: Monitoramento Operacional",
+      "regiao": "Grau de severidade: Informativo",
+      "descricao": "Aguardando nova emissão de boletim oficial de alertas para a região pela rede do INMET.",
+      "vigencia": "Ativa"
   }]
 
 
@@ -124,7 +112,7 @@ def gerar_json_para_site():
   with open("dados_oficiais.json", "w", encoding="utf-8") as f:
     json.dump(dados_finais, f, ensure_ascii=False, indent=4)
 
-  print("JSON atualizado com sucesso!")
+  print("JSON atualizado com dados reais da API!")
 
 
 if __name__ == "__main__":
