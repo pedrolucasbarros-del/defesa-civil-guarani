@@ -1,16 +1,16 @@
 {
-    "ultima_atualizacao": "06/11/2026 às 01:03",
+    "ultima_atualizacao": "06/11/2026 às 01:12",
     "simge": {
-        "data_extracao": "Quinta-feira, 5 de novembro de 2026.",
-        "texto_boletim": "Instabilidade provocada por transporte de umidade na Zona da Mata, com previsão de pancadas de chuva moderadas a fortes na bacia do Rio Pomba.",
-        "fonte": "simge.mg.gov.br (IGAM/SEMAD)"
+        "data_extracao": "06/11/2026 às 01:12",
+        "texto_boletim": "Hoje será mais um dia tórrido no estado de Minas Gerais. Assim como no dia de ontem, uma massa de ar quente e seca estará atuando em grande parte do estado provocando temperaturas máximas acima de 35°C nas mesorregiões: Norte, Noroeste, Vale do Jequitinhonha, Vale do Mucuri, Vale do Rio Doce, região Metropolitana, Triângulo Mineiro, Central de Minas e Zona da Mata. Cidades como januária, Montes Cl...",
+        "fonte": "SIMGE / IGAM / SEMAD-MG"
     },
     "inmet": [
         {
-            "aviso": "PERIGO POTENCIAL",
-            "regiao": "Zona da Mata MG",
-            "descricao": "Acumulado entre 20 e 30 mm/h ou até 50 mm/dia, com ventos fortes (40-60 km/h).",
-            "vigencia": "Ativa"
+            "aviso": "AVISO DE ATENÇÃO — INMET",
+            "regiao": "Zona da Mata / Bacia do Rio Pomba - MG",
+            "descricao": "Monitoramento ativo para acumulados de chuva e rajadas de vento na região.",
+            "vigencia": "Vigência Diária"
         }
     ]
 }
