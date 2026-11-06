@@ -1,13 +1,104 @@
 {
-    "ultima_atualizacao": "06/11/2026 às 01:49",
     "status_alerta": {
         "nivel": "Normalidade",
-        "cor": "verde",
-        "descricao": "Tempo estável na região. Temperatura: 22.9°C, Vento: 2.7 km/h, Chuva: 0.0 mm.",
-        "temperatura": "22.9°C",
+        "descricao": "Monitoramento ativo em Guarani. Temperatura atual de 23.1°C, com precipitação de 0.0 mm e ventos de 6.0 km/h.",
+        "temperatura": "23.1°C",
         "precipitacao": "0.0 mm",
-        "vento": "2.7 km/h"
+        "vento": "6.0 km/h"
     },
+    "modelos": {
+        "ecmwf": {
+            "chuva": "0.0 mm",
+            "temp": "19 / 31 °C",
+            "umid": "45 / 85 %",
+            "prob": "20 %",
+            "vento": "15.0 km/h",
+            "press": "1013 hPa"
+        },
+        "gfs": {
+            "chuva": "0.0 mm",
+            "temp": "18 / 32 °C",
+            "umid": "40 / 80 %",
+            "prob": "25 %",
+            "vento": "22.5 km/h",
+            "press": "1012 hPa"
+        },
+        "icon": {
+            "chuva": "0.0 mm",
+            "temp": "20 / 30 °C",
+            "umid": "50 / 90 %",
+            "prob": "15 %",
+            "vento": "18.0 km/h",
+            "press": "1014 hPa"
+        },
+        "media": {
+            "chuva": "0.0 mm",
+            "temp": "19 / 31 °C",
+            "umid": "45 / 85 %",
+            "prob": "20 %",
+            "vento": "20.1 km/h",
+            "press": "1013 hPa"
+        }
+    },
+    "graficos": {
+        "ecmwf": [
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20
+        ],
+        "gfs": [
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25
+        ],
+        "icon": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15
+        ],
+        "media": [
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20
+        ]
+    },
+    "semana": [],
     "contatos_emergencia": [
         {
             "orgao": "Corpo de Bombeiros",
@@ -29,5 +120,6 @@
             "numero": "Plantão Local",
             "descricao": "Coordenação de vistorias e atendimento em Guarani"
         }
-    ]
+    ],
+    "ultima_atualizacao": "06/11/2026 às 01:59"
 }
