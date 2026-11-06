@@ -9,7 +9,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- Header -->
     <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xl">
         <div class="flex items-center space-x-3">
             <div class="bg-orange-600 p-2.5 rounded-xl text-white shadow-lg shadow-orange-600/30">
@@ -34,12 +33,10 @@
 
     <main class="p-4 md:p-6 max-w-[1600px] mx-auto space-y-6 flex-grow w-full">
 
-        <!-- ================= ABA 1: PAINEL PRINCIPAL ================= -->
+        <!-- ================= ABA 1 ================= -->
         <div id="secao-principal" class="space-y-6">
             
-            <!-- Cards Superiores: Card Geral do Dia + Estações Futuras -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-3">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Resumo Diário (Consenso)</span>
@@ -81,18 +78,15 @@
                     <div class="text-2xl font-black text-blue-400 mt-1">-- m</div>
                     <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-800">Monitoramento de cota do rio (Aguardando API).</p>
                 </div>
-
             </div>
 
-            <!-- Central Grid: Estágio de Observação Diário + Radar Windy (Mantido no Painel) -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
                             <div>
                                 <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">ESTÁGIO DE OBSERVAÇÃO DIÁRIO</h2>
-                                <p class="text-[11px] text-slate-400 mt-0.5">baseado na média dos modelos meteorológicos</p>
+                                <p class="text-[10px] font-bold text-orange-400 mt-0.5 uppercase tracking-wide">BASEADO NA MÉDIA DOS MODELOS METEOROLÓGICOS</p>
                             </div>
                             <span id="badge-estagio" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-600 text-white">Normalidade</span>
                         </div>
@@ -114,14 +108,11 @@
                         <iframe src="https://embed.windy.com/embed2.html?lat=-21.3825&lon=-43.0811&zoom=11&level=surface&overlay=radar&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default" width="100%" height="100%" frameborder="0"></iframe>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- ================= ABA 2: MODELOS METEOROLÓGICOS ================= -->
+        <!-- ================= ABA 2 ================= -->
         <div id="secao-modelos" class="space-y-6 hidden">
-            
-            <!-- Seletor de Modelo para os Gráficos -->
             <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-4">
                 <div class="flex justify-between items-center pb-4 border-b border-slate-800 flex-wrap gap-3">
                     <div>
@@ -140,7 +131,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
-                    
                     <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center pb-2 border-b border-slate-800">
                             <span class="text-sm font-bold text-cyan-400 flex items-center gap-2">
@@ -149,7 +139,6 @@
                             <span class="text-[10px] text-slate-400 font-mono" id="label-modelo-ativo">ECMWF</span>
                         </div>
                         <div class="h-44 flex items-end gap-1 pt-4 pb-1" id="chart-prob-horaria"></div>
-                        <p class="text-[11px] text-slate-500">Evolução horária da probabilidade de precipitação para o dia corrente.</p>
                     </div>
 
                     <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
@@ -160,25 +149,20 @@
                             <span class="text-[10px] text-slate-400 font-mono">Milímetros (mm)</span>
                         </div>
                         <div class="h-44 flex items-end gap-2 pt-4 pb-1" id="chart-chuva-7d"></div>
-                        <p class="text-[11px] text-slate-500">Projeção de acumulado diário para o horizonte de uma semana.</p>
                     </div>
-
                 </div>
             </div>
 
-            <!-- Escala Sinótica e Radar do Windy na Aba de Modelos -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg space-y-4">
                 <div class="flex justify-between items-center pb-3 border-b border-slate-800">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
                         <i data-lucide="wind" class="w-4 h-4 text-cyan-400"></i> Escala Sinótica & Radar — Modelos Globais
                     </h3>
-                    <span class="text-xs text-slate-400">Circulação Global & Previsão Numérica</span>
                 </div>
                 <div class="w-full h-[450px] rounded-xl border border-slate-800 overflow-hidden">
                     <iframe src="https://embed.windy.com/embed2.html?lat=-21.3825&lon=-43.0811&zoom=8&level=surface&overlay=wind&menu=&message=&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default" width="100%" height="100%" frameborder="0"></iframe>
                 </div>
             </div>
-
         </div>
 
     </main>
