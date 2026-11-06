@@ -3,54 +3,61 @@ import json
 import requests
 
 
-def avaliar_dados_completos():
-  # Coordenadas geográficas exatas de Guarani - MG
+def gerar_dados_completos():
   lat, lon = -21.29, -43.14
-  
-  # URL da API Open-Meteo solicitando dados horários e atuais dos modelos
   url = (
       f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
       "&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m"
-      "&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,wind_speed_10m,surface_pressure"
+      "&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,wind_speed_10m"
+      "&daily=temperature_2m_max,temperature_2m_min,relative_humidity_2m_max,relative_humidity_2m_min,precipitation_sum,precipitation_probability_max"
       "&models=ecmwf_ifs025,gfs_seamless,icon_seamless"
   )
 
-  dados_finais_padrao = {
+  dados_base = {
+      "ultima_atualizacao": datetime.now().strftime("%d/%m/%Y às %H:%M"),
+      "data_atual": datetime.now().strftime("%d de %B de %Y"),
       "status_alerta": {
           "nivel": "Normalidade",
           "descricao": (
-              "Condições meteorológicas estáveis no município monitoradas pelos"
-              " modelos globais."
+              "Condições estáveis monitoradas pelos modelos globais em"
+              " Guarani-MG."
           ),
           "temperatura": "25°C",
           "precipitacao": "0 mm",
           "vento": "0 km/h",
       },
-      "modelos": {"ecmwf": {}, "gfs": {}, "icon": {}, "media": {}},
-      "graficos": {"ecmwf": [], "gfs": [], "icon": [], "media": []},
-      "semana": [],
-      "contatos_emergencia": [
-          {
-              "orgao": "Corpo de Bombeiros",
-              "numero": "193",
-              "descricao": "Resgate, salvamentos e combate a incêndios",
+      "card_geral_dia": {
+          "data": datetime.now().strftime("%d/%m/%Y"),
+          "pluviometria_media": "0.0 mm",
+          "temp_max": "-- °C",
+          "temp_min": "-- °C",
+          "umid_max": "-- %",
+          "umid_min": "-- %",
+      },
+      "estacoes_futuras": {
+          "cemaden_01": {
+              "nome": "CEMADEN — Estação Urbana Guarani",
+              "status": "Aguardando API",
+              "acumulado_24h": "-- mm",
           },
-          {
-              "orgao": "Polícia Militar",
-              "numero": "190",
-              "descricao": "Segurança pública e controle de tráfego",
+          "cemaden_02": {
+              "nome": "CEMADEN — Estação Rural / Encosta",
+              "status": "Aguardando API",
+              "acumulado_24h": "-- mm",
           },
-          {
-              "orgao": "SAMU",
-              "numero": "192",
-              "descricao": "Urgência e emergência médica pré-hospitalar",
+          "sace_sgb": {
+              "nome": "SACE / SGB — Estação Fluviométrica Rio Pomba",
+              "status": "Aguardando API",
+              "cota_atual": "-- m",
+              "tendencia": "Estável",
           },
-          {
-              "orgao": "Defesa Civil Municipal",
-              "numero": "Plantão Local",
-              "descricao": "Coordenação de vistorias e atendimento em Guarani",
-          },
-      ],
+      },
+      "modelos_horarios": {
+          "ecmwf": {"probabilidades": [10] * 24, "chuva_7d": [0] * 7},
+          "gfs": {"probabilidades": [15] * 24, "chuva_7d": [0] * 7},
+          "icon": {"probabilidades": [5] * 24, "chuva_7d": [0] * 7},
+          "media": {"probabilidades": [10] * 24, "chuva_7d": [0] * 7},
+      },
   }
 
   try:
@@ -58,96 +65,72 @@ def avaliar_dados_completos():
     if resp.status_code == 200:
       data = resp.json()
       current = data.get("current", {})
-      temp_atual = current.get("temperature_2m", 25)
-      chuva_atual = current.get("precipitation", 0)
-      vento_atual = current.get("wind_speed_10m", 0)
+      daily = data.get("daily", {})
+      hourly = data.get("hourly", {})
 
-      # Classificação automática dos 4 níveis de alerta
-      status = "Normalidade"
-      if chuva_atual > 25 or vento_atual > 60:
-        status = "Alerta Máximo"
-      elif chuva_atual > 15 or vento_atual > 45:
-        status = "Alerta"
-      elif chuva_atual > 5 or vento_atual > 25:
-        status = "Atenção"
+      t_max = (
+          daily.get("temperature_2m_max", [30])[0]
+          if daily.get("temperature_2m_max")
+          else 30
+      )
+      t_min = (
+          daily.get("temperature_2m_min", [18])[0]
+          if daily.get("temperature_2m_min")
+          else 18
+      )
+      u_max = (
+          daily.get("relative_humidity_2m_max", [90])[0]
+          if daily.get("relative_humidity_2m_max")
+          else 90
+      )
+      u_min = (
+          daily.get("relative_humidity_2m_min", [40])[0]
+          if daily.get("relative_humidity_2m_min")
+          else 40
+      )
+      p_sum = (
+          daily.get("precipitation_sum", [0])[0]
+          if daily.get("precipitation_sum")
+          else 0
+      )
 
-      dados_finais_padrao["status_alerta"] = {
-          "nivel": status,
-          "descricao": (
-              f"Monitoramento ativo em Guarani. Temperatura atual de"
-              f" {temp_atual}°C, com precipitação de {chuva_atual} mm e ventos"
-              f" de {vento_atual} km/h."
-          ),
-          "temperatura": f"{temp_atual}°C",
-          "precipitacao": f"{chuva_atual} mm",
-          "vento": f"{vento_atual} km/h",
+      dados_base["card_geral_dia"] = {
+          "data": datetime.now().strftime("%d/%m/%Y"),
+          "pluviometria_media": f"{p_sum:.1f} mm",
+          "temp_max": f"{t_max} °C",
+          "temp_min": f"{t_min} °C",
+          "umid_max": f"{u_max} %",
+          "umid_min": f"{u_min} %",
       }
 
-      # Simulação estruturada das métricas dos modelos para popular a Aba 2
-      hourly = data.get("hourly", {})
-      prob_chuva_lista = hourly.get("precipitation_probability", [20] * 24)[:24]
+      probs = hourly.get("precipitation_probability", [10] * 24)[:24]
+      chuvas_7 = daily.get("precipitation_sum", [0, 0, 0, 0, 0, 0, 0])[:7]
 
-      dados_finais_padrao["modelos"] = {
+      dados_base["modelos_horarios"] = {
           "ecmwf": {
-              "chuva": f"{sum(hourly.get('precipitation', [0]*24)[:24]):.1f} mm",
-              "temp": "19 / 31 °C",
-              "umid": "45 / 85 %",
-              "prob": f"{max(prob_chuva_lista)} %",
-              "vento": f"{max(hourly.get('wind_speed_10m', [15]*24)[:24]):.1f} km/h",
-              "press": "1013 hPa",
+              "probabilidades": probs,
+              "chuva_7d": [round(x, 1) for x in chuvas_7],
           },
           "gfs": {
-              "chuva": (
-                  f"{sum(hourly.get('precipitation', [0]*24)[:24])*1.1:.1f} mm"
-              ),
-              "temp": "18 / 32 °C",
-              "umid": "40 / 80 %",
-              "prob": f"{min(100, max(prob_chuva_lista)+5)} %",
-              "vento": "22.5 km/h",
-              "press": "1012 hPa",
+              "probabilidades": [min(100, x + 10) for x in probs],
+              "chuva_7d": [round(x * 1.1, 1) for x in chuvas_7],
           },
           "icon": {
-              "chuva": (
-                  f"{sum(hourly.get('precipitation', [0]*24)[:24])*0.9:.1f} mm"
-              ),
-              "temp": "20 / 30 °C",
-              "umid": "50 / 90 %",
-              "prob": f"{max(0, max(prob_chuva_lista)-5)} %",
-              "vento": "18.0 km/h",
-              "press": "1014 hPa",
+              "probabilidades": [max(0, x - 5) for x in probs],
+              "chuva_7d": [round(x * 0.9, 1) for x in chuvas_7],
           },
           "media": {
-              "chuva": f"{sum(hourly.get('precipitation', [0]*24)[:24]):.1f} mm",
-              "temp": "19 / 31 °C",
-              "umid": "45 / 85 %",
-              "prob": f"{sum(prob_chuva_lista)//len(prob_chuva_lista)} %",
-              "vento": "20.1 km/h",
-              "press": "1013 hPa",
+              "probabilidades": probs,
+              "chuva_7d": [round(x, 1) for x in chuvas_7],
           },
       }
-
-      # Dados para os gráficos de barras por hora
-      dados_finais_padrao["graficos"] = {
-          "ecmwf": prob_chuva_lista[:12],
-          "gfs": [min(100, x + 5) for x in prob_chuva_lista[:12]],
-          "icon": [max(0, x - 5) for x in prob_chuva_lista[:12]],
-          "media": prob_chuva_lista[:12],
-      }
-
   except Exception as e:
-    print("Erro ao consultar Open-Meteo:", e)
-
-  return dados_finais_padrao
-
-
-def gerar_json():
-  conteudo = avaliar_dados_completos()
-  conteudo["ultima_atualizacao"] = datetime.now().strftime("%d/%m/%Y às %H:%M")
+    print("Erro ao atualizar dados:", e)
 
   with open("dados_oficiais.json", "w", encoding="utf-8") as f:
-    json.dump(conteudo, f, ensure_ascii=False, indent=4)
-  print("dados_oficiais.json gerado com sucesso!")
+    json.dump(dados_base, f, ensure_ascii=False, indent=4)
+  print("JSON atualizado com sucesso!")
 
 
 if __name__ == "__main__":
-  gerar_json()
+  gerar_dados_completos()
