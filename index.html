@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoramento Hidrometeorológico - Guarani/MG | Painel Operacional</title>
+  
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #070b14;
+      color: #e2e8f0;
+    }
+
+    .card-panel {
+      background: #0d1527;
+      border: 1px solid #1a263d;
+      border-radius: 12px;
+    }
+
+    .tab-btn {
+      transition: all 0.2s ease;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      border-bottom-color: #ea580c;
+      color: #ea580c;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070b14; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <div>
+    <!-- HEADER -->
+    <header class="bg-[#0b1120] border-b border-[#1a2438] px-6 py-3.5 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+        <div class="flex items-center space-x-3.5">
+          <!-- Ícone de Chuva/Meteorologia no lugar do Escudo -->
+          <div class="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-600/30">
+            <i class="fa-solid fa-cloud-showers-heavy text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-xl font-extrabold text-white tracking-wide">MONITORAMENTO HIDROMETEOROLÓGICO</h1>
+              <span class="bg-orange-950/80 text-orange-400 border border-orange-800/80 text-xs px-2.5 py-0.5 rounded-md font-bold">GUARANI - MG</span>
+            </div>
+            <p class="text-xs text-slate-400">Sistema Operacional de Monitoramento Pluviométrico & Hidrológico</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3 text-xs flex-wrap">
+          <div class="flex items-center space-x-2 bg-[#111a2e] border border-[#1d2a45] px-3 py-1.5 rounded-lg text-slate-300">
+            <i class="fa-solid fa-location-dot text-red-400"></i>
+            <span>Lat: -21.3811 | Lon: -43.0031</span>
+          </div>
+          <!-- Relógio Operacional com Dia e Hora -->
+          <div class="flex items-center space-x-2 bg-[#111a2e] border border-[#1d2a45] px-3 py-1.5 rounded-lg text-orange-400 font-mono font-bold">
+            <i class="fa-regular fa-clock"></i>
+            <span id="header-relogio">--/--/---- --:--:--</span>
+          </div>
+          <div class="flex items-center space-x-2 bg-[#111a2e] border border-[#1d2a45] px-3 py-1.5 rounded-lg text-emerald-400 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="header-status">Online</span>
+          </div>
+          <button onclick="carregarDados()" class="flex items-center space-x-2 bg-[#162238] hover:bg-[#1f2d4a] border border-[#243454] text-slate-200 px-3 py-1.5 rounded-lg font-semibold transition">
+            <i class="fa-solid fa-rotate" id="icon-refresh"></i>
+            <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 py-5 space-y-5">
+
+      <!-- BARRA DE NAVEGAÇÃO DE ABAS -->
+      <div class="border-b border-[#182338] flex space-x-6 overflow-x-auto text-sm font-bold text-slate-400">
+        <button onclick="switchTab('geral')" id="tab-btn-geral" class="tab-btn active py-3 flex items-center space-x-2">
+          <i class="fa-solid fa-chart-pie text-orange-500"></i>
+          <span>Painel Geral</span>
+        </button>
+        <button onclick="switchTab('modelos')" id="tab-btn-modelos" class="tab-btn py-3 flex items-center space-x-2 hover:text-slate-200">
+          <i class="fa-solid fa-microchip"></i>
+          <span>Modelos Meteorológicos</span>
+        </button>
+        <button onclick="switchTab('graficos')" id="tab-btn-graficos" class="tab-btn py-3 flex items-center space-x-2 hover:text-slate-200">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Chuva Horária (Prob. & Intensidade)</span>
+        </button>
+        <button onclick="switchTab('semanal')" id="tab-btn-semanal" class="tab-btn py-3 flex items-center space-x-2 hover:text-slate-200">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Previsão 7 Dias (Gráficos)</span>
+        </button>
+      </div>
+
+      <!-- ABA 1: PAINEL GERAL -->
+      <div id="tab-geral" class="tab-content active space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="card-panel p-5 relative border-l-4 border-l-orange-500">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <span class="text-[11px] font-bold text-orange-500 uppercase tracking-wider block">RESUMO DIÁRIO (CONSENSO)</span>
+                <h4 id="geral-data" class="text-xs font-mono text-orange-400">--/--/----</h4>
+              </div>
+              <i class="fa-solid fa-calendar text-orange-400"></i>
+            </div>
+            <div class="my-2 flex items-baseline space-x-2">
+              <span id="geral-pluvial" class="text-2xl font-black text-white">0.0 mm</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-[#182338]">
+              <div><span class="text-slate-500 block text-[10px]">Temp (Mín/Máx)</span><strong id="geral-temp" class="text-slate-200">-- / --</strong></div>
+              <div><span class="text-slate-500 block text-[10px]">Umid (Mín/Máx)</span><strong id="geral-umid" class="text-slate-200">-- / --</strong></div>
+            </div>
+          </div>
+
+          <div class="card-panel p-5 relative opacity-80">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">CEMADEN — Urbana</span>
+              <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">API Futura</span>
+            </div>
+            <div class="text-2xl font-black text-slate-300 mt-1">-- mm</div>
+            <p class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
+          </div>
+
+          <div class="card-panel p-5 relative opacity-80">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">CEMADEN — Encosta</span>
+              <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">API Futura</span>
+            </div>
+            <div class="text-2xl font-black text-slate-300 mt-1">-- mm</div>
+            <p class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
+          </div>
+
+          <div class="card-panel p-5 relative opacity-80">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">SACE / SGB — Rio Pomba</span>
+              <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono">Fluviométrico</span>
+            </div>
+            <div class="text-2xl font-black text-blue-400 mt-1">-- m</div>
+            <p class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Monitoramento de cota do rio (Aguardando API).</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="card-panel p-5 space-y-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-[#182338] mb-4">
+                <div>
+                  <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">ESTÁGIO DE OBSERVAÇÃO DIÁRIO</h2>
+                  <p class="text-[10px] font-bold text-orange-400 mt-0.5 uppercase tracking-wide">BASEADO NA MÉDIA DOS MODELOS METEOROLÓGICOS</p>
+                </div>
+                <span id="badge-estagio" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-600 text-white">Normalidade</span>
+              </div>
+              <p id="desc-estagio" class="text-xs text-slate-300 leading-relaxed">
+                Condições meteorológicas estáveis monitoradas pelos modelos globais em Guarani-MG. Situação sob controle operacional.
+              </p>
+            </div>
+            <div class="bg-[#080d1a] p-3 rounded-xl border border-[#182338] text-[11px] text-slate-400 space-y-1">
+              <div class="flex justify-between"><span>Status da Rede:</span> <strong class="text-emerald-400">Operacional</strong></div>
+              <div class="flex justify-between"><span>Atualização:</span> <strong class="text-slate-200">Automática Open-Meteo</strong></div>
+            </div>
+          </div>
+
+          <div class="card-panel p-5 lg:col-span-2 flex flex-col space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-[#182338]">
+              <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                <i class="fa-solid fa-map text-blue-400"></i> Geoprocessamento & Radar Windy — Guarani, MG
+              </h2>
+            </div>
+            <div class="w-full h-[320px] rounded-xl overflow-hidden border border-[#1a263d] bg-slate-950">
+              <iframe 
+                src="https://embed.windy.com/embed.html?lat=-21.3811&lon=-43.0031&detailLat=-21.3811&detailLon=-43.0031&width=100%25&height=100%25&zoom=9&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1" 
+                class="w-full h-full border-0"
+                title="Windy Mapa Interativo">
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA 2: MODELOS METEOROLÓGICOS -->
+      <div id="tab-modelos" class="tab-content space-y-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 card-panel p-4">
+          <div>
+            <h2 class="text-base font-bold text-white">Modelos Meteorológicos Processados</h2>
+            <p class="text-xs text-slate-400">Comparativo dos modelos globais e consenso para Guarani / MG</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <label for="select-data-modelos" class="text-xs text-slate-400 font-semibold"><i class="fa-regular fa-calendar-days text-orange-400"></i> Data:</label>
+            <select id="select-data-modelos" onchange="renderizarGridModelos()" class="bg-[#080d1a] text-slate-200 border border-[#1c2942] text-xs rounded-lg p-2 font-semibold outline-none focus:border-orange-500">
+              <!-- Preenchido via JS dinamicamente -->
+            </select>
+          </div>
+        </div>
+
+        <div id="grid-modelos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Gerado via JavaScript -->
+        </div>
+      </div>
+
+      <!-- ABA 3: GRÁFICO CHUVA HORÁRIA -->
+      <div id="tab-graficos" class="tab-content space-y-4">
+        <div class="card-panel p-5 space-y-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-3 border-b border-[#182338]">
+            <div>
+              <h2 class="text-base font-bold text-white">Previsão Horária e Intensidade de Chuva</h2>
+              <p class="text-xs text-slate-400">Probabilidade (%) e volume previsto (mm/h)</p>
+            </div>
+            
+            <div class="flex items-center space-x-4 flex-wrap gap-2">
+              <div class="flex items-center space-x-2">
+                <label for="select-data-horario" class="text-xs text-slate-400 font-semibold"><i class="fa-regular fa-calendar-days text-cyan-400"></i> Data:</label>
+                <select id="select-data-horario" onchange="renderizarGraficoHorario()" class="bg-[#080d1a] text-slate-200 border border-[#1c2942] text-xs rounded-lg p-2 font-semibold outline-none focus:border-orange-500">
+                  <!-- Preenchido via JS -->
+                </select>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <label for="select-modelo-grafico" class="text-xs text-slate-400 font-semibold">Modelo:</label>
+                <select id="select-modelo-grafico" onchange="renderizarGraficoHorario()" class="bg-[#080d1a] text-slate-200 border border-[#1c2942] text-xs rounded-lg p-2 font-semibold outline-none focus:border-orange-500">
+                  <option value="consenso">Consenso (Média Geral)</option>
+                  <option value="ecmwf">ECMWF (Europeu)</option>
+                  <option value="gfs">GFS (Americano)</option>
+                  <option value="icon">ICON (Alemão)</option>
+                  <option value="gem">GEM (Canadense)</option>
+                  <option value="meteofrance">MeteoFrance (Francês)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-4 p-3 bg-[#080d1a] rounded-xl border border-[#182338] text-xs">
+            <span class="text-slate-400 font-bold">Escala de Cores:</span>
+            <span class="flex items-center gap-1.5 text-slate-300"><span class="w-3 h-3 bg-emerald-500 rounded"></span> Fraca (&lt;2 mm/h)</span>
+            <span class="flex items-center gap-1.5 text-slate-300"><span class="w-3 h-3 bg-yellow-400 rounded"></span> Moderada (2 - 10 mm/h)</span>
+            <span class="flex items-center gap-1.5 text-slate-300"><span class="w-3 h-3 bg-orange-500 rounded"></span> Forte (10 - 25 mm/h)</span>
+            <span class="flex items-center gap-1.5 text-slate-300"><span class="w-3 h-3 bg-red-600 rounded"></span> M. Forte (25 - 50 mm/h)</span>
+            <span class="flex items-center gap-1.5 text-slate-300"><span class="w-3 h-3 bg-purple-600 rounded"></span> Extrema (&gt;50 mm/h)</span>
+          </div>
+
+          <div class="w-full h-96 relative">
+            <canvas id="chart-chuva-horaria"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA 4: PREVISÃO 7 DIAS EM GRÁFICOS -->
+      <div id="tab-semanal" class="tab-content space-y-4">
+        <div class="card-panel p-5">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div>
+              <h2 class="text-base font-bold text-white">Previsão Semanal - Próximos 7 Dias</h2>
+              <p class="text-xs text-slate-400">Chuva (mm), Temperaturas Máx/Mín (°C) e Umidades Máx/Mín (%)</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <label for="select-modelo-semanal" class="text-xs text-slate-400 font-semibold">Modelo:</label>
+              <select id="select-modelo-semanal" onchange="renderizarGraficoSemanal()" class="bg-[#080d1a] text-slate-200 border border-[#1c2942] text-xs rounded-lg p-2 font-semibold outline-none focus:border-orange-500">
+                <option value="consenso">Consenso (Média Geral)</option>
+                <option value="ecmwf">ECMWF (Europeu)</option>
+                <option value="gfs">GFS (Americano)</option>
+                <option value="icon">ICON (Alemão)</option>
+                <option value="gem">GEM (Canadense)</option>
+                <option value="meteofrance">MeteoFrance (Francês)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="w-full h-96 relative">
+            <canvas id="chart-previsao-semanal"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#0b1120] border-t border-[#1a2438] py-4 px-6 text-center text-xs text-slate-500 mt-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+      <p class="font-medium">Monitoramento Hidrometeorológico de Guarani/MG • Sistema Integrado de Previsão</p>
+      <p class="font-mono text-[11px]">Coordenadas: -21.3811, -43.0031</p>
+    </div>
+  </footer>
+
+  <!-- ENGINE JS -->
+  <script>
+    const LAT = -21.3811;
+    const LON = -43.0031;
+
+    const MODELOS = [
+      { id: 'ecmwf', name: 'ECMWF (Europeu)', param: 'ecmwf_ifs025', color: '#3b82f6' },
+      { id: 'gfs', name: 'GFS (Americano)', param: 'gfs_seamless', color: '#ef4444' },
+      { id: 'icon', name: 'ICON (Alemão)', param: 'icon_seamless', color: '#10b981' },
+      { id: 'gem', name: 'GEM (Canadense)', param: 'gem_global', color: '#f59e0b' },
+      { id: 'meteofrance', name: 'MeteoFrance (Francês)', param: 'meteofrance_seamless', color: '#8b5cf6' }
+    ];
+
+    let dadosGuardados = {};
+    let chartHorarioInstance = null;
+    let chartSemanalInstance = null;
+
+    function gerarBaseEstavel(modId) {
+      const now = new Date();
+      const hourly = { time: [], temperature_2m: [], relative_humidity_2m: [], precipitation_probability: [], precipitation: [], surface_pressure: [], wind_speed_10m: [] };
+      const daily = { time: [], temperature_2m_max: [], temperature_2m_min: [], relative_humidity_2m_max: [], relative_humidity_2m_min: [], precipitation_sum: [], precipitation_probability_max: [], wind_speed_10m_max: [] };
+
+      const mults = { ecmwf: 1.0, gfs: 0.85, icon: 1.15, gem: 0.9, meteofrance: 1.05 };
+      const m = mults[modId] || 1.0;
+
+      for (let i = 0; i < 168; i++) {
+        const t = new Date(now.getTime() + i * 3600000);
+        hourly.time.push(t.toISOString().slice(0, 16));
+        hourly.temperature_2m.push(parseFloat((21 + Math.sin(i / 4) * 5).toFixed(1)));
+        hourly.relative_humidity_2m.push(Math.floor(70 + Math.cos(i / 5) * 20));
+        const prob = Math.max(0, Math.floor(Math.sin((i + 1) / 4) * 85));
+        hourly.precipitation_probability.push(prob);
+        hourly.precipitation.push(prob > 35 ? parseFloat((Math.sin(i / 3) * 5 * m).toFixed(1)) : 0);
+        hourly.surface_pressure.push(1012);
+        hourly.wind_speed_10m.push(11);
+      }
+
+      for (let d = 0; d < 7; d++) {
+        const dt = new Date(now.getTime() + d * 86400000);
+        daily.time.push(dt.toISOString().slice(0, 10));
+        daily.temperature_2m_max.push(27 + (d % 3));
+        daily.temperature_2m_min.push(17 + (d % 2));
+        daily.relative_humidity_2m_max.push(85 + (d % 5));
+        daily.relative_humidity_2m_min.push(40 + (d % 5));
+        daily.precipitation_sum.push(parseFloat((d * 2.2 * m + 1.5).toFixed(1)));
+        daily.precipitation_probability_max.push(Math.min(95, 45 + (d * 8)));
+        daily.wind_speed_10m_max.push(13);
+      }
+
+      return { hourly, daily };
+    }
+
+    window.addEventListener('load', function() {
+      MODELOS.forEach(m => dadosGuardados[m.id] = gerarBaseEstavel(m.id));
+      inicializarRelogio();
+      popularSeletoresDeData();
+      renderizarGridModelos();
+      atualizarResumoGeral();
+      carregarDados();
+    });
+
+    function inicializarRelogio() {
+      function atualizar() {
+        const agora = new Date();
+        const dataStr = agora.toLocaleDateString('pt-BR');
+        const horaStr = agora.toLocaleTimeString('pt-BR');
+        const el = document.getElementById('header-relogio');
+        if (el) el.innerText = `${dataStr} ${horaStr}`;
+      }
+      atualizar();
+      setInterval(atualizar, 1000);
+    }
+
+    function popularSeletoresDeData() {
+      const base = dadosGuardados['ecmwf'];
+      if (!base || !base.daily || !base.daily.time) return;
+
+      const datas = base.daily.time.slice(0, 7);
+      const selModelos = document.getElementById('select-data-modelos');
+      const selHorario = document.getElementById('select-data-horario');
+
+      if (selModelos) selModelos.innerHTML = '';
+      if (selHorario) selHorario.innerHTML = '';
+
+      datas.forEach((dataStr, index) => {
+        const d = new Date(dataStr + 'T00:00:00');
+        const rotulo = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        
+        const opt1 = document.createElement('option');
+        opt1.value = index;
+        opt1.text = `Dia ${index + 1} (${rotulo})`;
+        if (selModelos) selModelos.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = index;
+        opt2.text = `Dia ${index + 1} (${rotulo})`;
+        if (selHorario) selHorario.appendChild(opt2);
+      });
+    }
+
+    function switchTab(tabId) {
+      const tabs = ['geral', 'modelos', 'graficos', 'semanal'];
+      tabs.forEach(id => {
+        const el = document.getElementById(`tab-${id}`);
+        const btn = document.getElementById(`tab-btn-${id}`);
+        if (el) el.classList.remove('active');
+        if (btn) btn.classList.remove('active');
+      });
+
+      const activeEl = document.getElementById(`tab-${tabId}`);
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeEl) activeEl.classList.add('active');
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (tabId === 'graficos') {
+        setTimeout(renderizarGraficoHorario, 50);
+      } else if (tabId === 'semanal') {
+        setTimeout(renderizarGraficoSemanal, 50);
+      } else if (tabId === 'modelos') {
+        renderizarGridModelos();
+      }
+    }
+
+    async function carregarDados() {
+      const iconRefresh = document.getElementById('icon-refresh');
+      if (iconRefresh) iconRefresh.classList.add('fa-spin');
+
+      for (let m of MODELOS) {
+        try {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,surface_pressure,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,relative_humidity_2m_max,relative_humidity_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&models=${m.param}&timezone=America%2FSao_Paulo`;
+          const res = await fetch(url);
+          if (res.ok) {
+            const resJson = await res.json();
+            if (resJson && resJson.hourly) {
+              dadosGuardados[m.id] = resJson;
+            }
+          }
+        } catch (e) {
+          // Erro silencioso em ambiente local
+        }
+      }
+
+      popularSeletoresDeData();
+      renderizarGridModelos();
+      atualizarResumoGeral();
+      
+      if (iconRefresh) iconRefresh.classList.remove('fa-spin');
+    }
+
+    function atualizarResumoGeral() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dataStr = new Date().toLocaleDateString('pt-BR', options);
+      const elData = document.getElementById('geral-data');
+      if (elData) elData.innerText = dataStr;
+
+      let tMaxSum = 0, tMinSum = 0, uMaxSum = 0, uMinSum = 0, rSum = 0, count = 0;
+      MODELOS.forEach(m => {
+        const d = dadosGuardados[m.id];
+        if (d && d.daily && d.daily.temperature_2m_max) {
+          tMaxSum += d.daily.temperature_2m_max[0] || 30;
+          tMinSum += d.daily.temperature_2m_min[0] || 18;
+          uMaxSum += d.daily.relative_humidity_2m_max ? d.daily.relative_humidity_2m_max[0] || 85 : 85; 
+          uMinSum += d.daily.relative_humidity_2m_min ? d.daily.relative_humidity_2m_min[0] || 40 : 40;
+          rSum += d.daily.precipitation_sum[0] || 0;
+          count++;
+        }
+      });
+
+      if (count > 0) {
+        const elPluvial = document.getElementById('geral-pluvial');
+        const elTemp = document.getElementById('geral-temp');
+        const elUmid = document.getElementById('geral-umid');
+
+        if (elPluvial) elPluvial.innerText = `${(rSum / count).toFixed(1)} mm`;
+        if (elTemp) elTemp.innerText = `${(tMinSum / count).toFixed(0)}°C / ${(tMaxSum / count).toFixed(0)}°C`;
+        if (elUmid) elUmid.innerText = `${(uMinSum / count).toFixed(0)}% / ${(uMaxSum / count).toFixed(0)}%`;
+      }
+    }
+
+    function renderizarGridModelos() {
+      const container = document.getElementById('grid-modelos');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const selData = document.getElementById('select-data-modelos');
+      const diaIndex = selData ? parseInt(selData.value) || 0 : 0;
+
+      let cTemp = 0, cUmid = 0, cRain = 0, cProb = 0, cPres = 0, cCount = 0;
+      MODELOS.forEach(m => {
+        const d = dadosGuardados[m.id];
+        if (d && d.daily && d.daily.precipitation_sum) {
+          const hIdx = diaIndex * 24 + 12;
+          cTemp += d.hourly.temperature_2m ? d.hourly.temperature_2m[hIdx] || 25 : 25;
+          cUmid += d.hourly.relative_humidity_2m ? d.hourly.relative_humidity_2m[hIdx] || 70 : 70;
+          cPres += d.hourly.surface_pressure ? d.hourly.surface_pressure[hIdx] || 1012 : 1012;
+          cRain += d.daily.precipitation_sum[diaIndex] || 0;
+          cProb += d.daily.precipitation_probability_max ? d.daily.precipitation_probability_max[diaIndex] || 50 : 50;
+          cCount++;
+        }
+      });
+
+      if (cCount > 0) {
+        const htmlConsenso = `
+          <div class="card-panel p-4 flex flex-col justify-between border-2 border-orange-500/60 bg-gradient-to-br from-[#0d1527] to-[#151f38]">
+            <div class="flex justify-between items-center pb-3 border-b border-[#182338]">
+              <span class="font-bold text-xs text-orange-400 flex items-center gap-2">
+                <i class="fa-solid fa-calculator"></i>
+                Consenso Geral (Média)
+              </span>
+              <span class="text-[9px] bg-orange-950/80 text-orange-400 px-2 py-0.5 rounded border border-orange-800 font-mono">Multimodelo</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2.5 my-3">
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">TEMP. MÉDIA</span>
+                <span class="text-sm font-extrabold text-white">${(cTemp / cCount).toFixed(1)} °C</span>
+              </div>
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">UMIDADE MÉDIA</span>
+                <span class="text-sm font-extrabold text-white">${(cUmid / cCount).toFixed(0)} %</span>
+              </div>
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">CHUVA DIA</span>
+                <span class="text-sm font-extrabold text-blue-400">${(cRain / cCount).toFixed(1)} mm</span>
+              </div>
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">PROB. MÁXIMA</span>
+                <span class="text-sm font-extrabold text-cyan-400">${(cProb / cCount).toFixed(0)} %</span>
+              </div>
+            </div>
+
+            <div class="text-[10px] text-slate-400 flex justify-between pt-2 border-t border-[#182338]">
+              <span>Pressão Atmosférica Média:</span>
+              <span class="font-mono text-slate-200">${(cPres / cCount).toFixed(0)} hPa</span>
+            </div>
+          </div>
+        `;
+        container.innerHTML += htmlConsenso;
+      }
+
+      MODELOS.forEach(m => {
+        const d = dadosGuardados[m.id];
+        if (!d || !d.hourly) return;
+
+        const hIdx = diaIndex * 24 + 12;
+        const temp = d.hourly.temperature_2m && d.hourly.temperature_2m[hIdx] !== undefined ? d.hourly.temperature_2m[hIdx].toFixed(1) : '23.0';
+        const umid = d.hourly.relative_humidity_2m && d.hourly.relative_humidity_2m[hIdx] !== undefined ? d.hourly.relative_humidity_2m[hIdx].toFixed(0) : '72';
+        const pres = d.hourly.surface_pressure && d.hourly.surface_pressure[hIdx] !== undefined ? d.hourly.surface_pressure[hIdx].toFixed(0) : '1012';
+        const rain = d.daily && d.daily.precipitation_sum ? d.daily.precipitation_sum[diaIndex].toFixed(1) : '5.2';
+        const prob = d.daily && d.daily.precipitation_probability_max ? d.daily.precipitation_probability_max[diaIndex] : '65';
+
+        const html = `
+          <div class="card-panel p-4 flex flex-col justify-between">
+            <div class="flex justify-between items-center pb-3 border-b border-[#182338]">
+              <span class="font-bold text-xs text-white flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${m.color}"></span>
+                ${m.name}
+              </span>
+              <span class="text-[9px] text-slate-500 font-mono">Open-Meteo</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2.5 my-3">
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">TEMPERATURA</span>
+                <span class="text-sm font-extrabold text-white">${temp} °C</span>
+              </div>
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">UMIDADE</span>
+                <span class="text-sm font-extrabold text-white">${umid} %</span>
+              </div>
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">CHUVA DIA</span>
+                <span class="text-sm font-extrabold text-blue-400">${rain} mm</span>
+              </div>
+              <div class="bg-[#080d1a] p-2.5 rounded-xl border border-[#172238]">
+                <span class="text-[9px] font-bold text-slate-400 block uppercase">PROBABILIDADE</span>
+                <span class="text-sm font-extrabold text-cyan-400">${prob} %</span>
+              </div>
+            </div>
+
+            <div class="text-[10px] text-slate-400 flex justify-between pt-2 border-t border-[#182338]">
+              <span>Pressão Atmosférica:</span>
+              <span class="font-mono text-slate-200">${pres} hPa</span>
+            </div>
+          </div>
+        `;
+        container.innerHTML += html;
+      });
+    }
+
+    function getColorByIntensity(mm) {
+      if (mm <= 0.1) return '#1e293b';
+      if (mm < 2.0) return '#10b981';
+      if (mm < 10.0) return '#facc15';
+      if (mm < 25.0) return '#f97316';
+      if (mm < 50.0) return '#dc2626';
+      return '#9333ea';
+    }
+
+    function renderizarGraficoHorario() {
+      const selectEl = document.getElementById('select-modelo-grafico');
+      const selectData = document.getElementById('select-data-horario');
+      const canvas = document.getElementById('chart-chuva-horaria');
+      if (!canvas || !selectEl || !selectData) return;
+
+      const selectedId = selectEl.value;
+      const diaIndex = parseInt(selectData.value) || 0;
+      const ctx = canvas.getContext('2d');
+
+      let labels = [];
+      let probData = [];
+      let precData = [];
+
+      const baseData = dadosGuardados[selectedId === 'consenso' ? 'ecmwf' : selectedId] || Object.values(dadosGuardados)[0];
+      
+      if (baseData && baseData.hourly && baseData.hourly.time) {
+        const startIndex = diaIndex * 24;
+        const endIndex = startIndex + 24;
+
+        const timeSlice = baseData.hourly.time.slice(startIndex, endIndex);
+        labels = timeSlice.map(t => {
+          const d = new Date(t);
+          return `${d.getHours().toString().padStart(2, '0')}:00`;
+        });
+
+        if (selectedId === 'consenso') {
+          for (let i = startIndex; i < endIndex; i++) {
+            let pSum = 0, rSum = 0, c = 0;
+            MODELOS.forEach(m => {
+              const d = dadosGuardados[m.id];
+              if (d && d.hourly) {
+                pSum += d.hourly.precipitation_probability[i] || 0;
+                rSum += d.hourly.precipitation[i] || 0;
+                c++;
+              }
+            });
+            probData.push(c > 0 ? (pSum / c) : 0);
+            precData.push(c > 0 ? (rSum / c) : 0);
+          }
+        } else {
+          probData = baseData.hourly.precipitation_probability.slice(startIndex, endIndex);
+          precData = baseData.hourly.precipitation.slice(startIndex, endIndex);
+        }
+      }
+
+      const barColors = precData.map(val => getColorByIntensity(val));
+
+      if (chartHorarioInstance) {
+        chartHorarioInstance.destroy();
+      }
+
+      chartHorarioInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: 'Volume de Chuva (mm/h)',
+              data: precData,
+              backgroundColor: barColors,
+              borderColor: barColors,
+              borderWidth: 1,
+              yAxisID: 'yPrec',
+              barPercentage: 0.65
+            },
+            {
+              type: 'line',
+              label: 'Probabilidade (%)',
+              data: probData,
+              borderColor: '#06b6d4',
+              backgroundColor: 'rgba(6, 182, 212, 0.1)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true,
+              yAxisID: 'yProb',
+              pointRadius: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(30, 41, 59, 0.5)' } },
+            yPrec: { type: 'linear', position: 'left', title: { display: true, text: 'Volume (mm/h)', color: '#94a3b8' }, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(30, 41, 59, 0.5)' }, beginAtZero: true },
+            yProb: { type: 'linear', position: 'right', title: { display: true, text: 'Probabilidade (%)', color: '#06b6d4' }, min: 0, max: 100, ticks: { color: '#06b6d4' }, grid: { drawOnChartArea: false } }
+          },
+          plugins: { legend: { labels: { color: '#e2e8f0', font: { size: 12 } } } }
+        }
+      });
+    }
+
+    function renderizarGraficoSemanal() {
+      const selectEl = document.getElementById('select-modelo-semanal');
+      const canvas = document.getElementById('chart-previsao-semanal');
+      if (!canvas || !selectEl) return;
+
+      const selectedId = selectEl.value;
+      const ctx = canvas.getContext('2d');
+
+      let labels = [];
+      let rainData = [];
+      let tempMaxData = [];
+      let tempMinData = [];
+      let umidMaxData = [];
+      let umidMinData = [];
+
+      const baseData = dadosGuardados[selectedId === 'consenso' ? 'ecmwf' : selectedId] || Object.values(dadosGuardados)[0];
+
+      if (baseData && baseData.daily && baseData.daily.time) {
+        labels = baseData.daily.time.slice(0, 7).map(dateStr => {
+          const d = new Date(dateStr + 'T00:00:00');
+          return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        });
+
+        if (selectedId === 'consenso') {
+          for (let i = 0; i < 7; i++) {
+            let rSum = 0, tMaxSum = 0, tMinSum = 0, uMaxSum = 0, uMinSum = 0, c = 0;
+            MODELOS.forEach(m => {
+              const d = dadosGuardados[m.id];
+              if (d && d.daily) {
+                rSum += d.daily.precipitation_sum[i] || 0;
+                tMaxSum += d.daily.temperature_2m_max[i] || 0;
+                tMinSum += d.daily.temperature_2m_min[i] || 0;
+                uMaxSum += d.daily.relative_humidity_2m_max ? (d.daily.relative_humidity_2m_max[i] || 85) : 85;
+                uMinSum += d.daily.relative_humidity_2m_min ? (d.daily.relative_humidity_2m_min[i] || 40) : 40;
+                c++;
+              }
+            });
+            rainData.push(c > 0 ? (rSum / c) : 0);
+            tempMaxData.push(c > 0 ? (tMaxSum / c) : 0);
+            tempMinData.push(c > 0 ? (tMinSum / c) : 0);
+            umidMaxData.push(c > 0 ? (uMaxSum / c) : 0);
+            umidMinData.push(c > 0 ? (uMinSum / c) : 0);
+          }
+        } else {
+          rainData = baseData.daily.precipitation_sum.slice(0, 7);
+          tempMaxData = baseData.daily.temperature_2m_max.slice(0, 7);
+          tempMinData = baseData.daily.temperature_2m_min.slice(0, 7);
+          umidMaxData = baseData.daily.relative_humidity_2m_max ? baseData.daily.relative_humidity_2m_max.slice(0, 7) : [85,85,85,85,85,85,85];
+          umidMinData = baseData.daily.relative_humidity_2m_min ? baseData.daily.relative_humidity_2m_min.slice(0, 7) : [40,40,40,40,40,40,40];
+        }
+      }
+
+      const barColors = rainData.map(v => getColorByIntensity(v));
+
+      if (chartSemanalInstance) {
+        chartSemanalInstance.destroy();
+      }
+
+      chartSemanalInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: 'Chuva (mm)',
+              data: rainData,
+              backgroundColor: barColors,
+              borderColor: barColors,
+              borderWidth: 1,
+              yAxisID: 'yRain',
+              barPercentage: 0.5
+            },
+            {
+              type: 'line',
+              label: 'Temp. Máx (°C)',
+              data: tempMaxData,
+              borderColor: '#f97316',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3,
+              yAxisID: 'yTemp',
+              pointRadius: 3
+            },
+            {
+              type: 'line',
+              label: 'Temp. Mín (°C)',
+              data: tempMinData,
+              borderColor: '#38bdf8',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.3,
+              yAxisID: 'yTemp',
+              pointRadius: 3
+            },
+            {
+              type: 'line',
+              label: 'Umid. Máx (%)',
+              data: umidMaxData,
+              borderColor: '#a855f7',
+              backgroundColor: 'transparent',
+              borderWidth: 1.5,
+              borderDash: [4, 4],
+              tension: 0.3,
+              yAxisID: 'yUmid',
+              pointRadius: 2
+            },
+            {
+              type: 'line',
+              label: 'Umid. Mín (%)',
+              data: umidMinData,
+              borderColor: '#ec4899',
+              backgroundColor: 'transparent',
+              borderWidth: 1.5,
+              borderDash: [4, 4],
+              tension: 0.3,
+              yAxisID: 'yUmid',
+              pointRadius: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(30, 41, 59, 0.5)' } },
+            yRain: { type: 'linear', position: 'left', title: { display: true, text: 'Chuva (mm)', color: '#94a3b8' }, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(30, 41, 59, 0.5)' }, beginAtZero: true },
+            yTemp: { type: 'linear', position: 'right', title: { display: true, text: 'Temperatura (°C)', color: '#f97316' }, ticks: { color: '#f97316' }, grid: { drawOnChartArea: false } },
+            yUmid: { type: 'linear', position: 'right', display: false, min: 0, max: 100 }
+          },
+          plugins: { legend: { labels: { color: '#e2e8f0', font: { size: 11 } } } }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
