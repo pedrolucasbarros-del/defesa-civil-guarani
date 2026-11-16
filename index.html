@@ -172,10 +172,10 @@
                   <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">ESTÁGIO DE OBSERVAÇÃO DIÁRIO</h2>
                   <p class="text-[10px] font-bold text-orange-400 mt-0.5 uppercase tracking-wide">BASEADO NA MÉDIA DOS MODELOS METEOROLÓGICOS</p>
                 </div>
-                <span id="badge-estagio" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-600 text-white">Normalidade</span>
+                <span id="badge-estagio" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-600 text-white">Sem Alerta / Baixo</span>
               </div>
               <p id="desc-estagio" class="text-xs text-slate-300 leading-relaxed">
-                Condições meteorológicas estáveis monitoradas pelos modelos globais em Guarani-MG. Situação sob controle operacional.
+                Calculando status de alerta com base na média dos modelos globais...
               </p>
             </div>
             <div class="bg-[#080d1a] p-3 rounded-xl border border-[#182338] text-[11px] text-slate-400 space-y-1">
@@ -454,6 +454,7 @@
       if (iconRefresh) iconRefresh.classList.remove('fa-spin');
     }
 
+    // Função atualizada com a lógica do estágio de observação baseada na tabela de alertas
     function atualizarResumoGeral() {
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       const dataStr = new Date().toLocaleDateString('pt-BR', options);
@@ -474,13 +475,40 @@
       });
 
       if (count > 0) {
+        const mediaChuva = rSum / count;
         const elPluvial = document.getElementById('geral-pluvial');
         const elTemp = document.getElementById('geral-temp');
         const elUmid = document.getElementById('geral-umid');
 
-        if (elPluvial) elPluvial.innerText = `${(rSum / count).toFixed(1)} mm`;
+        if (elPluvial) elPluvial.innerText = `${mediaChuva.toFixed(1)} mm`;
         if (elTemp) elTemp.innerText = `${(tMinSum / count).toFixed(0)}°C / ${(tMaxSum / count).toFixed(0)}°C`;
         if (elUmid) elUmid.innerText = `${(uMinSum / count).toFixed(0)}% / ${(uMaxSum / count).toFixed(0)}%`;
+
+        // Classificação do Estágio de Observação baseada no Consenso
+        const badge = document.getElementById('badge-estagio');
+        const desc = document.getElementById('desc-estagio');
+
+        if (badge && desc) {
+          badge.className = 'px-3 py-1 rounded-full text-xs font-black uppercase text-white';
+
+          if (mediaChuva < 20) {
+            badge.innerText = 'Sem Alerta / Baixo';
+            badge.classList.add('bg-emerald-600');
+            desc.innerHTML = `Acumulado previsto de <strong>${mediaChuva.toFixed(1)} mm</strong> (Fraca a Moderada). Chuva benéfica ou passageira, sem transtornos relevantes.`;
+          } else if (mediaChuva >= 20 && mediaChuva < 50) {
+            badge.innerText = 'Amarelo (Perigo Potencial)';
+            badge.classList.add('bg-amber-500', 'text-slate-950');
+            desc.innerHTML = `Acumulado previsto de <strong>${mediaChuva.toFixed(1)} mm</strong> (Moderada). Baixo risco de alagamentos pontuais e pequenos deslizamentos.`;
+          } else if (mediaChuva >= 50 && mediaChuva <= 100) {
+            badge.innerText = 'Laranja (Perigo)';
+            badge.classList.add('bg-orange-600');
+            desc.innerHTML = `Acumulado previsto de <strong>${mediaChuva.toFixed(1)} mm</strong> (Forte). Risco significativo de alagamentos, transbordamento de córregos e queda de galhos.`;
+          } else {
+            badge.innerText = 'Vermelho (Grande Perigo)';
+            badge.classList.add('bg-red-600');
+            desc.innerHTML = `Acumulado previsto de <strong>${mediaChuva.toFixed(1)} mm</strong> (Muito Forte / Extrema). Grande probabilidade de inundações graves, enxurradas e deslizamentos de terra.`;
+          }
+        }
       }
     }
 
