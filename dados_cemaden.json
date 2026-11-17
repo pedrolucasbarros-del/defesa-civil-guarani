@@ -1,8 +1,8 @@
 {
-  "atualizado_em": "17/11/2026 09:09:57",
+  "atualizado_em": "17/11/2026 09:15:35",
   "municipio": "Guarani - MG",
   "codibge": "3128402",
   "estacoes": [],
   "status": "erro",
-  "mensagem_erro": "404 Client Error: Not Found for url: https://sgaa.cemaden.gov.br/controle-tokens/tokens"
+  "mensagem_erro": "400 Client Error: Bad Request for url: https://sws.cemaden.gov.br/PED/rest/pcds/pcds-dados-recentes?codibge=3128402"
 }
