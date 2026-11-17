@@ -7,8 +7,8 @@ from datetime import datetime, timezone, timedelta
 EMAIL = os.environ.get("CEMADEN_EMAIL")
 PASSWORD = os.environ.get("CEMADEN_PASSWORD")
 
-URL_SGAA = "https://sgaa.cemaden.gov.br/controle-tokens/tokens"
-URL_SWS_BASE = "https://sws.cemaden.gov.br"
+URL_SGAA = "https://sgaa.cemaden.gov.br/SGAA/rest/controle-token/tokens"
+URL_SWS_BASE = "https://sws.cemaden.gov.br/PED/rest"
 COD_IBGE_GUARANI = "3128402"
 
 def obter_token():
@@ -26,7 +26,7 @@ def buscar_dados_sws(endpoint, token, params=None):
     url = f"{URL_SWS_BASE}{endpoint}"
     resp = requests.get(url, headers=headers, params=params, timeout=30)
     
-    # Se o token expirar (401) ou faltar (400), gera um novo e tenta novamente (Manual p. 3)
+    # Se o token expirar (401) ou faltar (400), gera um novo e tenta novamente
     if resp.status_code in [400, 401]:
         novo_token = obter_token()
         headers["token"] = novo_token
@@ -49,14 +49,14 @@ def main():
     try:
         token = obter_token()
         
-        # 1. Consulta os acumulados recentes (chuva 1h, 3h, 6h, 12h, 24h, etc.) para Guarani/MG
+        # 1. Consulta os acumulados recentes para Guarani/MG
         dados_acum = buscar_dados_sws(
             "/pcds-acum/acumulados-recentes",
             token,
             params={"codibge": COD_IBGE_GUARANI}
         )
         
-        # 2. Consulta também os dados recentes das PCDs para garantir nome/código das estações
+        # 2. Consulta também os dados recentes das PCDs
         dados_recentes = buscar_dados_sws(
             "/pcds/pcds-dados-recentes",
             token,
@@ -71,7 +71,6 @@ def main():
         resultado["status"] = "erro"
         resultado["mensagem_erro"] = str(e)
 
-    # Salva o resultado no repositório para o index.html ler
     with open("dados_cemaden.json", "w", encoding="utf-8") as f:
         json.dump(resultado, f, ensure_ascii=False, indent=2)
 
