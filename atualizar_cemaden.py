@@ -49,22 +49,14 @@ def main():
     try:
         token = obter_token()
         
-        # 1. Consulta os acumulados recentes para Guarani/MG
+        # Consulta os acumulados recentes para Guarani/MG (codibge=3128402)
         dados_acum = buscar_dados_sws(
             "/pcds-acum/acumulados-recentes",
             token,
             params={"codibge": COD_IBGE_GUARANI}
         )
-        
-        # 2. Consulta também os dados recentes das PCDs
-        dados_recentes = buscar_dados_sws(
-            "/pcds/pcds-dados-recentes",
-            token,
-            params={"codibge": COD_IBGE_GUARANI}
-        )
 
         resultado["acumulados_raw"] = dados_acum
-        resultado["recentes_raw"] = dados_recentes
         resultado["status"] = "ok"
 
     except Exception as e:
