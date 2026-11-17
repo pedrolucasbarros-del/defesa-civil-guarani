@@ -1,8 +1,8 @@
 {
-  "atualizado_em": "17/11/2026 09:05:54",
+  "atualizado_em": "17/11/2026 09:09:57",
   "municipio": "Guarani - MG",
   "codibge": "3128402",
   "estacoes": [],
   "status": "erro",
-  "mensagem_erro": "404 Client Error: Not Found for url: https://sgaa.cemaden.gov.br/controle-token/tokens"
+  "mensagem_erro": "404 Client Error: Not Found for url: https://sgaa.cemaden.gov.br/controle-tokens/tokens"
 }
