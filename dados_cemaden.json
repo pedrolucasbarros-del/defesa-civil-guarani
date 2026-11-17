@@ -1,21 +1,21 @@
 {
-  "atualizado_em": "17/11/2026 13:49:32",
+  "atualizado_em": "17/11/2026 14:50:46",
   "municipio": "Guarani - MG",
   "codibge": "3128402",
   "estacoes": [
     {
-      "acc120hr": 56.6,
-      "acc12hr": 3.4,
-      "acc1hr": 0.0,
-      "acc24hr": 7.4,
+      "acc120hr": 56.8,
+      "acc12hr": 3.2,
+      "acc1hr": 0.2,
+      "acc24hr": 7.2,
       "acc3hr": 0.4,
-      "acc48hr": 13.4,
-      "acc6hr": 0.8,
-      "acc72hr": 14.8,
-      "acc96hr": 56.6,
+      "acc48hr": 12.4,
+      "acc6hr": 1.0,
+      "acc72hr": 15.0,
+      "acc96hr": 56.8,
       "codestacao": "312840201A",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:32.054526",
+      "datahora": "2026-11-17T17:50:35.277705",
       "id_estacao": 19393,
       "nome_oficial": "G2-312840201A"
     },
@@ -31,7 +31,7 @@
       "acc96hr": 97.4,
       "codestacao": "312840202A",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:32.054535",
+      "datahora": "2026-11-17T17:50:35.277714",
       "id_estacao": 19394,
       "nome_oficial": "G2-312840202A"
     }
@@ -42,14 +42,14 @@
       "acc12hr": 3.2,
       "acc1hr": null,
       "acc24hr": 6.8,
-      "acc3hr": 2.4,
-      "acc48hr": 9.6,
+      "acc3hr": 0.0,
+      "acc48hr": 9.4,
       "acc6hr": 2.6,
       "acc72hr": 20.6,
       "acc96hr": 39.0,
       "codestacao": "58729800",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:27.287167",
+      "datahora": "2026-11-17T17:50:31.354499",
       "id_estacao": 11744
     },
     {
@@ -64,7 +64,7 @@
       "acc96hr": 96.6,
       "codestacao": "58730001",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:27.287175",
+      "datahora": "2026-11-17T17:50:31.354507",
       "id_estacao": 11745
     },
     {
@@ -79,7 +79,7 @@
       "acc96hr": 60.6,
       "codestacao": "58730080",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:27.287183",
+      "datahora": "2026-11-17T17:50:31.354514",
       "id_estacao": 11746
     },
     {
@@ -94,7 +94,7 @@
       "acc96hr": 48.4,
       "codestacao": "58731000",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:27.287191",
+      "datahora": "2026-11-17T17:50:31.354522",
       "id_estacao": 11749
     },
     {
@@ -104,27 +104,27 @@
       "acc24hr": 8.0,
       "acc3hr": 0.0,
       "acc48hr": 8.4,
-      "acc6hr": 0.2,
+      "acc6hr": 0.0,
       "acc72hr": 12.6,
       "acc96hr": 31.6,
       "codestacao": "58731300",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:27.287198",
+      "datahora": "2026-11-17T17:50:31.354530",
       "id_estacao": 11750
     },
     {
-      "acc120hr": 56.6,
-      "acc12hr": 3.4,
-      "acc1hr": 0.0,
-      "acc24hr": 7.4,
+      "acc120hr": 56.8,
+      "acc12hr": 3.2,
+      "acc1hr": 0.2,
+      "acc24hr": 7.2,
       "acc3hr": 0.4,
-      "acc48hr": 13.4,
-      "acc6hr": 0.8,
-      "acc72hr": 14.8,
-      "acc96hr": 56.6,
+      "acc48hr": 12.4,
+      "acc6hr": 1.0,
+      "acc72hr": 15.0,
+      "acc96hr": 56.8,
       "codestacao": "312840201A",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:32.054526",
+      "datahora": "2026-11-17T17:50:35.277705",
       "id_estacao": 19393,
       "nome_oficial": "G2-312840201A"
     },
@@ -140,7 +140,7 @@
       "acc96hr": 97.4,
       "codestacao": "312840202A",
       "codibge": 3128402,
-      "datahora": "2026-11-17T16:49:32.054535",
+      "datahora": "2026-11-17T17:50:35.277714",
       "id_estacao": 19394,
       "nome_oficial": "G2-312840202A"
     }
