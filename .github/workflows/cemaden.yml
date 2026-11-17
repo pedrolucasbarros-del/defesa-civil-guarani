@@ -1,0 +1,38 @@
+name: Atualizar Dados Cemaden
+
+on:
+  schedule:
+    # Roda a cada 15 minutos
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Permite rodar manualmente clicando em um botão na aba Actions
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Executar script Cemaden
+        env:
+          CEMADEN_EMAIL: ${{ secrets.CEMADEN_EMAIL }}
+          CEMADEN_PASSWORD: ${{ secrets.CEMADEN_PASSWORD }}
+        run: python atualizar_cemaden.py
+
+      - name: Salvar dados_cemaden.json no repositório
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dados_cemaden.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Atualização automática Cemaden" && git push)
