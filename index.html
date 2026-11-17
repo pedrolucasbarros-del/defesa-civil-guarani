@@ -136,10 +136,10 @@
             </div>
           </div>
 
-          <!-- CARD CEMADEN — ESTAÇÃO 1 (312840201A) -->
+          <!-- CARD CEMADEN — CENTRO - PREFEITURA (312840201A) -->
           <div id="card-cemaden-urbana" class="card-panel p-5 relative">
             <div class="flex justify-between items-center gap-2 mb-2">
-              <span id="urbana-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CEMADEN — Urbana</span>
+              <span id="urbana-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CENTRO - PREFEITURA</span>
               <select id="select-janela-urbana" onchange="atualizarVisualizacaoCemaden()" class="bg-[#080d1a] text-orange-400 border border-[#1c2942] text-[10px] rounded px-1.5 py-0.5 font-bold outline-none focus:border-orange-500 cursor-pointer">
                 <option value="acc1hr">1h</option>
                 <option value="acc3hr">3h</option>
@@ -156,10 +156,10 @@
             <p id="urbana-desc" class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
           </div>
 
-          <!-- CARD CEMADEN — ESTAÇÃO 2 (312840202A) -->
+          <!-- CARD CEMADEN — CACHOEIRA - UBS (312840202A) -->
           <div id="card-cemaden-encosta" class="card-panel p-5 relative">
             <div class="flex justify-between items-center gap-2 mb-2">
-              <span id="encosta-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CEMADEN — Encosta</span>
+              <span id="encosta-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CACHOEIRA - UBS</span>
               <select id="select-janela-encosta" onchange="atualizarVisualizacaoCemaden()" class="bg-[#080d1a] text-orange-400 border border-[#1c2942] text-[10px] rounded px-1.5 py-0.5 font-bold outline-none focus:border-orange-500 cursor-pointer">
                 <option value="acc1hr">1h</option>
                 <option value="acc3hr">3h</option>
@@ -340,6 +340,12 @@
       { id: 'meteofrance', name: 'MeteoFrance (Francês)', param: 'meteofrance_seamless', color: '#8b5cf6' }
     ];
 
+    // Mapeamento personalizado dos nomes das estações do CEMADEN em Guarani/MG
+    const NOMES_ESTACOES_CEMADEN = {
+      '312840201A': 'CENTRO - PREFEITURA',
+      '312840202A': 'CACHOEIRA - UBS'
+    };
+
     let dadosGuardados = {};
     let dadosCemadenCache = null;
     let chartHorarioInstance = null;
@@ -497,16 +503,23 @@
       }
     }
 
+    function obterNomeEstacaoCemaden(est) {
+      const cod = String(est.codestacao || '').replace(/^G2-/, '').trim();
+      return NOMES_ESTACOES_CEMADEN[cod] || est.nome_oficial || `CEMADEN — ${cod}`;
+    }
+
     function atualizarVisualizacaoCemaden() {
       if (!dadosCemadenCache) return;
 
       const dados = dadosCemadenCache;
-      // Filtra as duas estações oficiais do CEMADEN em Guarani/MG (312840201A e 312840202A)
-      const lista = (dados.estacoes && dados.estacoes.length > 0)
+      const bruto = (dados.estacoes && dados.estacoes.length > 0)
         ? dados.estacoes
-        : (dados.acumulados_raw || [])
-            .filter(e => String(e.codestacao || '').startsWith('3128402'))
-            .sort((a, b) => String(a.codestacao).localeCompare(String(b.codestacao)));
+        : (dados.acumulados_raw || []);
+
+      // Filtra e garante a ordem exata: 312840201A primeiro, 312840202A segundo
+      const lista = bruto
+        .filter(e => String(e.codestacao || '').includes('3128402'))
+        .sort((a, b) => String(a.codestacao).localeCompare(String(b.codestacao)));
 
       const rotulos = {
         'acc1hr': 'Última 1h',
@@ -520,22 +533,22 @@
         'acc120hr': 'Últimas 120h'
       };
 
-      // Estação 1 (312840201A)
+      // Estação 1: CENTRO - PREFEITURA (312840201A)
       if (lista.length > 0) {
         const est1 = lista[0];
         const chave1 = document.getElementById('select-janela-urbana')?.value || 'acc24hr';
         const val1 = parseFloat(est1[chave1] ?? 0);
-        document.getElementById('urbana-nome').innerText = est1.nome_oficial || `CEMADEN — ${est1.codestacao}`;
+        document.getElementById('urbana-nome').innerText = obterNomeEstacaoCemaden(est1);
         document.getElementById('urbana-valor').innerText = `${val1.toFixed(1)} mm`;
         document.getElementById('urbana-desc').innerText = `${rotulos[chave1]} • Cód: ${est1.codestacao} • ${dados.atualizado_em}`;
       }
 
-      // Estação 2 (312840202A)
+      // Estação 2: CACHOEIRA - UBS (312840202A)
       if (lista.length > 1) {
         const est2 = lista[1];
         const chave2 = document.getElementById('select-janela-encosta')?.value || 'acc24hr';
         const val2 = parseFloat(est2[chave2] ?? 0);
-        document.getElementById('encosta-nome').innerText = est2.nome_oficial || `CEMADEN — ${est2.codestacao}`;
+        document.getElementById('encosta-nome').innerText = obterNomeEstacaoCemaden(est2);
         document.getElementById('encosta-valor').innerText = `${val2.toFixed(1)} mm`;
         document.getElementById('encosta-desc').innerText = `${rotulos[chave2]} • Cód: ${est2.codestacao} • ${dados.atualizado_em}`;
       }
