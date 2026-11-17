@@ -136,36 +136,40 @@
             </div>
           </div>
 
-          <!-- CARD CEMADEN — URBANA -->
+          <!-- CARD CEMADEN — ESTAÇÃO 1 (312840201A) -->
           <div id="card-cemaden-urbana" class="card-panel p-5 relative">
             <div class="flex justify-between items-center gap-2 mb-2">
               <span id="urbana-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CEMADEN — Urbana</span>
               <select id="select-janela-urbana" onchange="atualizarVisualizacaoCemaden()" class="bg-[#080d1a] text-orange-400 border border-[#1c2942] text-[10px] rounded px-1.5 py-0.5 font-bold outline-none focus:border-orange-500 cursor-pointer">
-                <option value="15m">15 min</option>
-                <option value="30m">30 min</option>
-                <option value="1h">1h</option>
-                <option value="3h">3h</option>
-                <option value="6h">6h</option>
-                <option value="12h">12h</option>
-                <option value="24h" selected>24h</option>
+                <option value="acc1hr">1h</option>
+                <option value="acc3hr">3h</option>
+                <option value="acc6hr">6h</option>
+                <option value="acc12hr">12h</option>
+                <option value="acc24hr" selected>24h</option>
+                <option value="acc48hr">48h</option>
+                <option value="acc72hr">72h</option>
+                <option value="acc96hr">96h</option>
+                <option value="acc120hr">120h</option>
               </select>
             </div>
             <div id="urbana-valor" class="text-2xl font-black text-white mt-1">-- mm</div>
             <p id="urbana-desc" class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
           </div>
 
-          <!-- CARD CEMADEN — ENCOSTA -->
+          <!-- CARD CEMADEN — ESTAÇÃO 2 (312840202A) -->
           <div id="card-cemaden-encosta" class="card-panel p-5 relative">
             <div class="flex justify-between items-center gap-2 mb-2">
               <span id="encosta-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CEMADEN — Encosta</span>
               <select id="select-janela-encosta" onchange="atualizarVisualizacaoCemaden()" class="bg-[#080d1a] text-orange-400 border border-[#1c2942] text-[10px] rounded px-1.5 py-0.5 font-bold outline-none focus:border-orange-500 cursor-pointer">
-                <option value="15m">15 min</option>
-                <option value="30m">30 min</option>
-                <option value="1h">1h</option>
-                <option value="3h">3h</option>
-                <option value="6h">6h</option>
-                <option value="12h">12h</option>
-                <option value="24h" selected>24h</option>
+                <option value="acc1hr">1h</option>
+                <option value="acc3hr">3h</option>
+                <option value="acc6hr">6h</option>
+                <option value="acc12hr">12h</option>
+                <option value="acc24hr" selected>24h</option>
+                <option value="acc48hr">48h</option>
+                <option value="acc72hr">72h</option>
+                <option value="acc96hr">96h</option>
+                <option value="acc120hr">120h</option>
               </select>
             </div>
             <div id="encosta-valor" class="text-2xl font-black text-white mt-1">-- mm</div>
@@ -467,7 +471,7 @@
         }
       }
 
-      // 2. Atualiza dados das estações do CEMADEN (dados_cemaden.json gerado via GitHub Actions)
+      // 2. Atualiza dados das estações do CEMADEN (dados_cemaden.json)
       await carregarCemaden();
 
       popularSeletoresDeData();
@@ -489,86 +493,51 @@
         dadosCemadenCache = dados;
         atualizarVisualizacaoCemaden();
       } catch (e) {
-        console.warn('Aguardando primeira execução do dados_cemaden.json');
+        console.warn('Aguardando dados_cemaden.json');
       }
-    }
-
-    function extrairAcumuladoPorJanela(estacao, janela, listaRecentes) {
-      // Mapeia possíveis chaves retornadas pelo endpoint /pcds-acum/acumulados-recentes
-      const mapaChaves = {
-        '15m': ['acc15min', 'acc10min', 'acumulado15m', 'acumulado10m'],
-        '30m': ['acc30min', 'acumulado30m'],
-        '1h':  ['acc1hr', 'acc1h', 'acumulado1h', 'acumulado1hr'],
-        '3h':  ['acc3hr', 'acc3h', 'acumulado3h', 'acumulado3hr'],
-        '6h':  ['acc6hr', 'acc6h', 'acumulado6h', 'acumulado6hr'],
-        '12h': ['acc12hr', 'acc12h', 'acumulado12h', 'acumulado12hr'],
-        '24h': ['acc24hr', 'acc24h', 'acumulado24h', 'acumulado24hr', 'valor']
-      };
-
-      const candidatos = mapaChaves[janela] || [];
-      for (const chave of candidatos) {
-        if (estacao[chave] !== undefined && estacao[chave] !== null) {
-          return parseFloat(estacao[chave]);
-        }
-      }
-
-      // Fallback para 15m caso o endpoint traga apenas 10m ou leituras brutas em recentes_raw
-      if (janela === '15m' && Array.isArray(listaRecentes)) {
-        const cod = estacao.codestacao || estacao.codigo;
-        const leituras = listaRecentes
-          .filter(r => (r.codestacao || r.codigo) === cod)
-          .slice(0, 2); // últimas 2 leituras (~10-20 min)
-        if (leituras.length > 0) {
-          return leituras.reduce((acc, item) => acc + (parseFloat(item.valor || item.chuva || 0) || 0), 0);
-        }
-      }
-
-      return 0;
     }
 
     function atualizarVisualizacaoCemaden() {
       if (!dadosCemadenCache) return;
 
       const dados = dadosCemadenCache;
-      const lista = Array.isArray(dados.acumulados_raw)
-        ? dados.acumulados_raw
-        : (dados.acumulados_raw?.data || []);
-      const listaRecentes = Array.isArray(dados.recentes_raw)
-        ? dados.recentes_raw
-        : (dados.recentes_raw?.data || []);
+      // Filtra as duas estações oficiais do CEMADEN em Guarani/MG (312840201A e 312840202A)
+      const lista = (dados.estacoes && dados.estacoes.length > 0)
+        ? dados.estacoes
+        : (dados.acumulados_raw || [])
+            .filter(e => String(e.codestacao || '').startsWith('3128402'))
+            .sort((a, b) => String(a.codestacao).localeCompare(String(b.codestacao)));
 
-      const rotulosJanela = {
-        '15m': 'Últimos 15 min',
-        '30m': 'Últimos 30 min',
-        '1h':  'Última 1h',
-        '3h':  'Últimas 3h',
-        '6h':  'Últimas 6h',
-        '12h': 'Últimas 12h',
-        '24h': 'Últimas 24h'
+      const rotulos = {
+        'acc1hr': 'Última 1h',
+        'acc3hr': 'Últimas 3h',
+        'acc6hr': 'Últimas 6h',
+        'acc12hr': 'Últimas 12h',
+        'acc24hr': 'Últimas 24h',
+        'acc48hr': 'Últimas 48h',
+        'acc72hr': 'Últimas 72h',
+        'acc96hr': 'Últimas 96h',
+        'acc120hr': 'Últimas 120h'
       };
 
-      // Estação 1 (Urbana)
+      // Estação 1 (312840201A)
       if (lista.length > 0) {
         const est1 = lista[0];
-        const janela1 = document.getElementById('select-janela-urbana')?.value || '24h';
-        const nome1 = est1.nome || est1.nomeestacao || 'CEMADEN — Urbana';
-        const val1 = extrairAcumuladoPorJanela(est1, janela1, listaRecentes);
-
-        document.getElementById('urbana-nome').innerText = nome1;
+        const chave1 = document.getElementById('select-janela-urbana')?.value || 'acc24hr';
+        const val1 = parseFloat(est1[chave1] ?? 0);
+        document.getElementById('urbana-nome').innerText = est1.nome_oficial || `CEMADEN — ${est1.codestacao}`;
         document.getElementById('urbana-valor').innerText = `${val1.toFixed(1)} mm`;
-        document.getElementById('urbana-desc').innerText = `${rotulosJanela[janela1]} • Atualizado: ${dados.atualizado_em}`;
+        document.getElementById('urbana-desc').innerText = `${rotulos[chave1]} • Cód: ${est1.codestacao} • ${dados.atualizado_em}`;
       }
 
-      // Estação 2 (Encosta)
+      // Estação 2 (312840202A)
       if (lista.length > 1) {
         const est2 = lista[1];
-        const janela2 = document.getElementById('select-janela-encosta')?.value || '24h';
-        const nome2 = est2.nome || est2.nomeestacao || 'CEMADEN — Encosta';
-        const val2 = extrairAcumuladoPorJanela(est2, janela2, listaRecentes);
-
-        document.getElementById('encosta-nome').innerText = nome2;
+        const chave2 = document.getElementById('select-janela-encosta')?.value || 'acc24hr';
+        const val2 = parseFloat(est2[chave2] ?? 0);
+        document.getElementById('encosta-nome').innerText = est2.nome_oficial || `CEMADEN — ${est2.codestacao}`;
         document.getElementById('encosta-valor').innerText = `${val2.toFixed(1)} mm`;
-        document.getElementById('encosta-desc').innerText = `${rotulosJanela[janela2]} • Atualizado: ${dados.atualizado_em}`;
+        document.getElementById('encosta-desc').innerText = `${rotulos[chave2]} • Cód: ${est2.codestacao} • ${dados.atualizado_em}`;
       }
     }
 
