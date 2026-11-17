@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 EMAIL = os.environ.get("CEMADEN_EMAIL")
 PASSWORD = os.environ.get("CEMADEN_PASSWORD")
 
-URL_SGAA = "https://sgaa.cemaden.gov.br/controle-token/tokens"
+URL_SGAA = "https://sgaa.cemaden.gov.br/controle-tokens/tokens"
 URL_SWS_BASE = "https://sws.cemaden.gov.br"
 COD_IBGE_GUARANI = "3128402"
 
