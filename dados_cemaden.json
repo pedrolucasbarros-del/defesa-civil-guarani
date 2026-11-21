@@ -1,8 +1,8 @@
 {
-  "atualizado_em": "21/11/2026 20:06:52",
+  "atualizado_em": "21/11/2026 20:44:48",
   "municipio": "Guarani - MG",
   "codibge": "3128402",
   "estacoes": [],
   "status": "erro",
-  "mensagem_erro": "HTTPSConnectionPool(host='sgaa.cemaden.gov.br', port=443): Max retries exceeded with url: /SGAA/rest/controle-token/tokens (Caused by NameResolutionError(\"HTTPSConnection(host='sgaa.cemaden.gov.br', port=443): Failed to resolve 'sgaa.cemaden.gov.br' ([Errno -3] Temporary failure in name resolution)\"))"
+  "mensagem_erro": "503 Server Error: Service Unavailable for url: https://sws.cemaden.gov.br/PED/rest/pcds-acum/acumulados-recentes?codibge=3128402"
 }
