@@ -1,0 +1,27 @@
+{
+  "estacao": {
+    "codigo": "58730001",
+    "nome": "GUARANI",
+    "rio": "Rio Pomba",
+    "municipio": "Guarani",
+    "uf": "MG"
+  },
+  "atualizado_em_utc": "2026-11-23T21:52:00Z",
+  "ultima_leitura": {
+    "data_hora_medicao": "2026-11-23 17:45:00",
+    "cota_cm": 301.1,
+    "vazao_m3s": null,
+    "chuva_mm": 0.0,
+    "status_cota": "0",
+    "status_vazao": "0",
+    "status_chuva": "0"
+  },
+  "variacao_ultima_leitura_cm": 0.0,
+  "tendencia": "estavel",
+  "total_registros": 3,
+  "serie": [
+    { "data_hora_medicao": "2026-11-23 15:45:00", "cota_cm": 300.5, "chuva_mm": 0.0 },
+    { "data_hora_medicao": "2026-11-23 16:45:00", "cota_cm": 301.0, "chuva_mm": 0.0 },
+    { "data_hora_medicao": "2026-11-23 17:45:00", "cota_cm": 301.1, "chuva_mm": 0.0 }
+  ]
+}
