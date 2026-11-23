@@ -87,38 +87,51 @@ def buscar_serie_adotada(token: str, codigo_estacao: str, tentativas_5xx: int = 
     }
 
     agora_br = datetime.now(timezone(timedelta(hours=-3)))
-    data_iso = agora_br.strftime("%Y-%m-%d")
-    data_br = agora_br.strftime("%d/%m/%Y")
+    inicio_br = agora_br - timedelta(days=2)
+
+    data_ini_iso = inicio_br.strftime("%Y-%m-%d")
+    data_fim_iso = agora_br.strftime("%Y-%m-%d")
+    data_ini_br = inicio_br.strftime("%d/%m/%Y")
+    data_fim_br = agora_br.strftime("%d/%m/%Y")
 
     endpoints = [
         f"{BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1",
         f"{BASE_URL}/HidroinfoanaSerieTelemetricaDetalhada/v1",
     ]
 
+    # Nomes oficiais do manual HidroWebService ANA + variações de data
     candidatos_params = [
         {
-            "codEstacao": codigo_estacao,
-            "tipoFiltroDados": "DATA_LEITURA",
-            "dataBusca": data_iso,
-            "intervaloBusca": "DIAS_2",
+            "CodigoDaEstacao": codigo_estacao,
+            "TipoFiltroData": "DATA_LEITURA",
+            "RangeIntervaloDeBusca": "DIAS_2",
+        },
+        {
+            "CodigoDaEstacao": codigo_estacao,
+            "TipoFiltroData": "DATA_ULTIMA_ATUALIZACAO",
+            "RangeIntervaloDeBusca": "DIAS_2",
+        },
+        {
+            "CodigoDaEstacao": codigo_estacao,
+            "TipoFiltroData": "DATA_LEITURA",
+            "dataBusca": data_ini_iso,
+            "RangeIntervaloDeBusca": "DIAS_2",
+        },
+        {
+            "CodigoDaEstacao": codigo_estacao,
+            "TipoFiltroData": "DATA_LEITURA",
+            "dataBusca": data_ini_br,
+            "RangeIntervaloDeBusca": "DIAS_2",
+        },
+        {
+            "codigoEstacao": codigo_estacao,
+            "dataInicio": data_ini_iso,
+            "dataFim": data_fim_iso,
         },
         {
             "codEstacao": codigo_estacao,
-            "tipoFiltroDados": "DATA_ULTIMA_ATUALIZACAO",
-            "dataBusca": data_iso,
-            "intervaloBusca": "DIAS_2",
-        },
-        {
-            "codEstacao": codigo_estacao,
-            "tipoFiltroDados": "DATA_LEITURA",
-            "dataBusca": data_br,
-            "intervaloBusca": "DIAS_2",
-        },
-        {
-            "codEstacao": codigo_estacao,
-            "tipoFiltroDados": "DATA_LEITURA",
-            "dataBusca": data_iso,
-            "intervaloBusca": "HORAS_24",
+            "dataInicio": data_ini_iso,
+            "dataFim": data_fim_iso,
         },
     ]
 
