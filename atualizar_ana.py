@@ -3,8 +3,7 @@ import io
 import json
 import os
 import re
-import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from html import unescape
 from pathlib import Path
 from urllib.parse import urljoin
@@ -14,7 +13,6 @@ SACE_RELATORIO_URL = (
     "https://sace.sgb.gov.br/niveis/relatorio.php"
     "?apenas_grafico=sim&bacia=pomba&pm=7&s=11&sr=10"
 )
-BASE_URL = "https://www.ana.gov.br/hidrowebservice/EstacoesTelemetricas"
 ESTACAO_PADRAO = "58730001"  # GUARANI - Rio Pomba
 ARQUIVO_SAIDA = Path("dados_ana_pomba.json")
 
@@ -101,7 +99,6 @@ def buscar_dados_sace(url_sace: str = SACE_RELATORIO_URL) -> dict:
     texto_plano = re.sub(r"<[^>]+>", " ", unescape(html))
     texto_plano = re.sub(r"\s+", " ", texto_plano).strip()
 
-    # Exemplo na página: "291 Cota (cm) Última medição: 23/11/2026 19:45 Situação: Normal"
     match_cota = re.search(r"(-?\d+(?:[.,]\d+)?)\s*Cota\s*\(cm\)", texto_plano, flags=re.IGNORECASE)
     cota_atual = parse_float(match_cota.group(1)) if match_cota else None
 
@@ -174,124 +171,15 @@ def buscar_dados_sace(url_sace: str = SACE_RELATORIO_URL) -> dict:
     }
 
 
-def obter_token_ana(identificador: str, senha: str, tentativas: int = 2) -> str:
-    url = f"{BASE_URL}/OAUth/v1"
-    headers = {
-        "Identificador": identificador,
-        "Senha": senha,
-        "Accept": "application/json",
-    }
-
-    for tentativa in range(1, tentativas + 1):
-        try:
-            resp = requests.get(url, headers=headers, timeout=(10, 25))
-            if resp.status_code == 200:
-                payload = resp.json()
-                items = payload.get("items") if isinstance(payload, dict) else None
-                if isinstance(items, list) and items:
-                    item = items[0]
-                elif isinstance(items, dict):
-                    item = items
-                else:
-                    item = payload if isinstance(payload, dict) else {}
-                token = (
-                    item.get("tokenautenticacao")
-                    or item.get("TokenAutenticacao")
-                    or item.get("token")
-                    or payload.get("tokenautenticacao")
-                    or payload.get("token")
-                )
-                if token:
-                    return token
-        except requests.exceptions.RequestException as exc:
-            print(f"Fallback ANA /OAUth tentativa {tentativa}/{tentativas} falhou: {exc}")
-        if tentativa < tentativas:
-            time.sleep(3)
-
-    raise RuntimeError("Token ANA indisponível no fallback.")
-
-
-def extrair_lista_ana(data) -> list[dict]:
-    if isinstance(data, list):
-        return data
-    if isinstance(data, dict):
-        for chave in ("items", "Items", "dados", "Dados", "resultado", "Resultado"):
-            if isinstance(data.get(chave), list):
-                return data[chave]
-    return []
-
-
-def buscar_fallback_ana(codigo_estacao: str) -> dict:
-    identificador = os.environ.get("ANA_IDENTIFICADOR", "").strip()
-    senha = os.environ.get("ANA_SENHA", "").strip()
-    if not identificador or not senha:
-        raise RuntimeError("Credenciais ANA não configuradas para fallback.")
-
-    token = obter_token_ana(identificador, senha)
-    headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
-    agora_br = datetime.now(timezone(timedelta(hours=-3)))
-    data_iso = agora_br.strftime("%Y-%m-%d")
-
-    url = f"{BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1"
-    params = {
-        "CodigoDaEstacao": codigo_estacao,
-        "TipoFiltroData": "DATA_LEITURA",
-        "dataBusca": data_iso,
-        "RangeIntervaloDeBusca": "DIAS_2",
-    }
-    resp = requests.get(url, headers=headers, params=params, timeout=(10, 30))
-    resp.raise_for_status()
-
-    serie = []
-    for r in extrair_lista_ana(resp.json()):
-        dt_str = normalizar_data_hora(
-            r.get("Data_Hora_Medicao") or r.get("dataHoraMedicao") or r.get("DataHora") or ""
-        )
-        cota_val = parse_float(
-            r.get("Cota_Adotada") or r.get("cotaAdotada") or r.get("Cota") or r.get("cota")
-        )
-        vazao_val = parse_float(
-            r.get("Vazao_Adotada") or r.get("vazaoAdotada") or r.get("Vazao") or r.get("vazao")
-        )
-        chuva_val = parse_float(
-            r.get("Chuva_Adotada") or r.get("chuvaAdotada") or r.get("Chuva") or r.get("chuva")
-        )
-        if dt_str or cota_val is not None:
-            serie.append({
-                "data_hora_medicao": dt_str,
-                "cota_cm": cota_val,
-                "vazao_m3s": vazao_val,
-                "chuva_mm": chuva_val,
-                "status_cota": str(r.get("Cota_Adotada_Status") or "0"),
-                "status_vazao": str(r.get("Vazao_Adotada_Status") or "0"),
-                "status_chuva": str(r.get("Chuva_Adotada_Status") or "0"),
-            })
-
-    serie.sort(key=lambda item: item["data_hora_medicao"])
-    if not serie:
-        raise RuntimeError("Fallback ANA retornou série vazia.")
-
-    return {
-        "fonte": "ANA / HidroWebService",
-        "situacao_sace": None,
-        "ultima_medicao_texto": serie[-1]["data_hora_medicao"],
-        "serie": serie,
-    }
-
-
 def main():
-    codigo_estacao = os.environ.get("ANA_ESTACAO_POMBA", ESTACAO_PADRAO).strip()
+    codigo_estacao = os.environ.get("SACE_ESTACAO_CODIGO", ESTACAO_PADRAO).strip()
     url_sace = os.environ.get("SACE_RELATORIO_URL", SACE_RELATORIO_URL).strip()
 
     try:
         coleta = buscar_dados_sace(url_sace=url_sace)
-    except Exception as exc_sace:
-        print(f"Aviso: falha ao coletar do SACE/SGB ({exc_sace}). Tentando fallback na ANA...")
-        try:
-            coleta = buscar_fallback_ana(codigo_estacao=codigo_estacao)
-        except Exception as exc_ana:
-            print(f"Aviso: fallback da ANA também falhou ({exc_ana}). Encerrando sem falha do workflow.")
-            return
+    except Exception as exc:
+        print(f"Aviso: falha ao coletar do SACE/SGB ({exc}). Encerrando sem falha do workflow.")
+        return
 
     serie = coleta["serie"]
     ultima = serie[-1] if serie else None
