@@ -180,13 +180,16 @@
             <p id="encosta-desc" class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
           </div>
 
-          <div class="card-panel p-5 relative opacity-80">
+          <!-- CARD SACE / SGB — RIO POMBA -->
+          <div id="card-sace-pomba" class="card-panel p-5 relative border-l-4 border-l-blue-500">
             <div class="flex justify-between items-start mb-2">
               <span class="text-xs font-bold uppercase tracking-wider text-slate-400">SACE / SGB — Rio Pomba</span>
-              <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono">Fluviométrico</span>
+              <span id="sace-badge" class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono">ANA 58730001</span>
             </div>
-            <div class="text-2xl font-black text-blue-400 mt-1">-- m</div>
-            <p class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Monitoramento de cota do rio (Aguardando API).</p>
+            <div id="sace-cota-valor" class="text-2xl font-black text-blue-400 mt-1">-- cm</div>
+            <p id="sace-cota-desc" class="text-[11px] text-slate-400 pt-3 border-t border-[#182338] mt-2">
+              Aguardando leitura de dados_ana_pomba.json...
+            </p>
           </div>
         </div>
 
@@ -388,7 +391,7 @@
               <div class="bg-[#080d1a] p-4 rounded-xl border border-[#182338] space-y-2 text-xs">
                 <div class="font-bold uppercase tracking-wider text-slate-400 text-[10px]">Cotas de Referência Operacional (Ajustáveis)</div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-                  <div class="text-yellow-300"><strong>Atenção:</strong> <span id="ref-atencao">320 cm</span></div>
+                  <div class="text-yellow-300"><strong>Atenção:</strong> <span id="ref-atencao">300 cm</span></div>
                   <div class="text-orange-400"><strong>Alerta:</strong> <span id="ref-alerta">400 cm</span></div>
                   <div class="text-red-400"><strong>Inundação:</strong> <span id="ref-inundacao">500 cm</span></div>
                 </div>
@@ -431,10 +434,10 @@
       '312840202A': 'CACHOEIRA - UBS'
     };
 
-    // Ajuste os valores abaixo (em cm) conforme as cotas oficiais para Guarani (estação 58730001)
+    // Cotas de referência (em cm) para Guarani (estação 58730001)
     const COTAS_POMBA = {
       minimoEscala: 100,
-      atencao: 320,
+      atencao: 300,
       alerta: 400,
       inundacao: 500,
       maximoEscala: 600
@@ -606,6 +609,10 @@
       const histEl = document.getElementById('ana-historico-lista');
       const escalaEl = document.getElementById('ana-escala-legenda');
 
+      const saceValorEl = document.getElementById('sace-cota-valor');
+      const saceDescEl = document.getElementById('sace-cota-desc');
+      const saceBadgeEl = document.getElementById('sace-badge');
+
       if (document.getElementById('ref-atencao')) document.getElementById('ref-atencao').innerText = `${COTAS_POMBA.atencao} cm`;
       if (document.getElementById('ref-alerta')) document.getElementById('ref-alerta').innerText = `${COTAS_POMBA.alerta} cm`;
       if (document.getElementById('ref-inundacao')) document.getElementById('ref-inundacao').innerText = `${COTAS_POMBA.inundacao} cm`;
@@ -620,6 +627,17 @@
         const cotaRaw = ultima.cota_cm;
         const cota = cotaRaw === null || cotaRaw === undefined ? NaN : Number(cotaRaw);
         const status = classificarNivelPomba(cota);
+        const cotaFormatada = Number.isFinite(cota) ? `${cota.toFixed(1)} cm` : '-- cm';
+        const varCm = dados.variacao_ultima_leitura_cm;
+        const varTxt = typeof varCm === 'number' && Number.isFinite(varCm)
+          ? ` (${varCm >= 0 ? '+' : ''}${varCm} cm)`
+          : '';
+
+        if (saceValorEl) saceValorEl.innerText = cotaFormatada;
+        if (saceBadgeEl) saceBadgeEl.innerText = status.rotulo;
+        if (saceDescEl) {
+          saceDescEl.innerText = `Leitura: ${ultima.data_hora_medicao || '--'}${varTxt}`;
+        }
 
         if (metaEl) {
           const cod = dados.estacao?.codigo || '58730001';
@@ -632,17 +650,8 @@
           badgeEl.innerText = status.rotulo;
         }
 
-        if (cotaEl) {
-          cotaEl.innerText = Number.isFinite(cota) ? `${cota.toFixed(1)} cm` : '-- cm';
-        }
-
-        if (tendEl) {
-          const varCm = dados.variacao_ultima_leitura_cm;
-          const varTxt = typeof varCm === 'number' && Number.isFinite(varCm)
-            ? ` (${varCm >= 0 ? '+' : ''}${varCm} cm)`
-            : '';
-          tendEl.innerText = `${dados.tendencia || 'sem_dados'}${varTxt}`;
-        }
+        if (cotaEl) cotaEl.innerText = cotaFormatada;
+        if (tendEl) tendEl.innerText = `${dados.tendencia || 'sem_dados'}${varTxt}`;
 
         if (chuvaEl) {
           const chuva = typeof ultima.chuva_mm === 'number' && Number.isFinite(ultima.chuva_mm)
@@ -667,6 +676,7 @@
         }
       } catch (err) {
         if (metaEl) metaEl.innerText = `Aguardando dados_ana_pomba.json (${err.message})`;
+        if (saceDescEl) saceDescEl.innerText = `Aguardando dados_ana_pomba.json (${err.message})`;
       }
     }
 
