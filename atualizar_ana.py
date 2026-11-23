@@ -18,8 +18,17 @@ def obter_token(identificador: str, senha: str, tentativas: int = 3) -> str:
         "Accept": "application/json",
     }
 
+    ultimo_erro = None
     for tentativa in range(1, tentativas + 1):
-        resp = requests.get(url, headers=headers, timeout=30)
+        try:
+            resp = requests.get(url, headers=headers, timeout=(15, 60))
+        except requests.exceptions.RequestException as exc:
+            ultimo_erro = exc
+            print(f"Tentativa {tentativa}/{tentativas} em /OAUth/v1 falhou por rede/timeout: {exc}")
+            if tentativa < tentativas:
+                time.sleep(5 * (2 ** (tentativa - 1)))
+            continue
+
         if resp.status_code < 500:
             resp.raise_for_status()
             payload = resp.json()
@@ -47,6 +56,8 @@ def obter_token(identificador: str, senha: str, tentativas: int = 3) -> str:
         if tentativa < tentativas:
             time.sleep(5 * (2 ** (tentativa - 1)))
 
+    if ultimo_erro is not None:
+        raise ultimo_erro
     resp.raise_for_status()
 
 
@@ -82,7 +93,7 @@ def buscar_serie_adotada(token: str, codigo_estacao: str, tentativas_5xx: int = 
         "https://www.ana.gov.br/hidrowebservice/v3/api-docs",
     ):
         try:
-            doc_resp = requests.get(doc_url, headers=headers, timeout=15)
+            doc_resp = requests.get(doc_url, headers=headers, timeout=(10, 20))
             if doc_resp.status_code == 200:
                 spec = doc_resp.json()
                 for path, methods in spec.get("paths", {}).items():
@@ -132,7 +143,15 @@ def buscar_serie_adotada(token: str, codigo_estacao: str, tentativas_5xx: int = 
     ultimo_erro = None
     for params in candidatos_params:
         for tentativa in range(1, tentativas_5xx + 1):
-            resp = requests.get(url, headers=headers, params=params, timeout=45)
+            try:
+                resp = requests.get(url, headers=headers, params=params, timeout=(15, 60))
+            except requests.exceptions.RequestException as exc:
+                ultimo_erro = ("REDE", url, str(exc))
+                print(f"Tentativa {tentativa}/{tentativas_5xx} falhou por rede/timeout: {exc}")
+                if tentativa < tentativas_5xx:
+                    time.sleep(5 * (2 ** (tentativa - 1)))
+                continue
+
             if resp.status_code == 200:
                 print(f"Sucesso com parâmetros: {params}")
                 return extrair_lista(resp.json())
@@ -202,14 +221,14 @@ def main():
     try:
         token = obter_token(identificador, senha)
         brutos = buscar_serie_adotada(token, codigo_estacao=codigo_estacao)
-    except requests.exceptions.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else None
-        if status and status >= 500:
-            print(f"Aviso: API da ANA retornou {status}. Encerrando sem falha do workflow.")
+    except requests.exceptions.RequestException as exc:
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        if status is None or status >= 500:
+            print(f"Aviso: falha temporária/timeout na API da ANA ({exc}). Encerrando sem falha do workflow.")
             return
         raise
     except RuntimeError as exc:
-        if "Falha 5" in str(exc):
+        if "Falha 5" in str(exc) or "Falha REDE" in str(exc):
             print(f"Aviso: {exc}. Encerrando sem falha do workflow.")
             return
         raise
