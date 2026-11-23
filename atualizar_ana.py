@@ -86,86 +86,69 @@ def buscar_serie_adotada(token: str, codigo_estacao: str, tentativas_5xx: int = 
         "Accept": "application/json",
     }
 
-    # Consulta o OpenAPI/Swagger da própria ANA para registrar os parâmetros exatos no log
-    for doc_url in (
-        f"{BASE_URL}/v3/api-docs",
-        f"{BASE_URL}/v2/api-docs",
-        "https://www.ana.gov.br/hidrowebservice/v3/api-docs",
-    ):
-        try:
-            doc_resp = requests.get(doc_url, headers=headers, timeout=(10, 20))
-            if doc_resp.status_code == 200:
-                spec = doc_resp.json()
-                for path, methods in spec.get("paths", {}).items():
-                    if "SerieTelemetrica" in path:
-                        params_doc = methods.get("get", {}).get("parameters", [])
-                        nomes = [
-                            (p.get("name"), p.get("required"), p.get("schema", {}).get("enum"))
-                            for p in params_doc
-                        ]
-                        print(f"Swagger {path} -> parâmetros: {nomes}")
-        except Exception as exc:
-            print(f"Aviso ao ler Swagger {doc_url}: {exc}")
-
     agora_br = datetime.now(timezone(timedelta(hours=-3)))
     data_iso = agora_br.strftime("%Y-%m-%d")
     data_br = agora_br.strftime("%d/%m/%Y")
-    data_hora_iso = (agora_br - timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
 
-    url = f"{BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1"
+    endpoints = [
+        f"{BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1",
+        f"{BASE_URL}/HidroinfoanaSerieTelemetricaDetalhada/v1",
+    ]
+
     candidatos_params = [
         {
-            "codigoEstacao": codigo_estacao,
+            "codEstacao": codigo_estacao,
             "tipoFiltroDados": "DATA_LEITURA",
             "dataBusca": data_iso,
             "intervaloBusca": "DIAS_2",
         },
         {
-            "codigoEstacao": codigo_estacao,
+            "codEstacao": codigo_estacao,
             "tipoFiltroDados": "DATA_ULTIMA_ATUALIZACAO",
             "dataBusca": data_iso,
             "intervaloBusca": "DIAS_2",
         },
         {
-            "codigoEstacao": codigo_estacao,
+            "codEstacao": codigo_estacao,
             "tipoFiltroDados": "DATA_LEITURA",
             "dataBusca": data_br,
             "intervaloBusca": "DIAS_2",
         },
         {
-            "codigoEstacao": codigo_estacao,
+            "codEstacao": codigo_estacao,
             "tipoFiltroDados": "DATA_LEITURA",
-            "dataBusca": data_hora_iso,
+            "dataBusca": data_iso,
             "intervaloBusca": "HORAS_24",
         },
     ]
 
     ultimo_erro = None
-    for params in candidatos_params:
-        for tentativa in range(1, tentativas_5xx + 1):
-            try:
-                resp = requests.get(url, headers=headers, params=params, timeout=(15, 60))
-            except requests.exceptions.RequestException as exc:
-                ultimo_erro = ("REDE", url, str(exc))
-                print(f"Tentativa {tentativa}/{tentativas_5xx} falhou por rede/timeout: {exc}")
-                if tentativa < tentativas_5xx:
-                    time.sleep(5 * (2 ** (tentativa - 1)))
-                continue
+    for url in endpoints:
+        for params in candidatos_params:
+            for tentativa in range(1, tentativas_5xx + 1):
+                try:
+                    resp = requests.get(url, headers=headers, params=params, timeout=(15, 60))
+                except requests.exceptions.RequestException as exc:
+                    ultimo_erro = ("REDE", url, str(exc))
+                    print(f"Tentativa {tentativa}/{tentativas_5xx} falhou por rede/timeout: {exc}")
+                    if tentativa < tentativas_5xx:
+                        time.sleep(5 * (2 ** (tentativa - 1)))
+                    continue
 
-            if resp.status_code == 200:
-                print(f"Sucesso com parâmetros: {params}")
-                return extrair_lista(resp.json())
+                if resp.status_code == 200:
+                    print(f"Sucesso em {url.split('/')[-2]} com parâmetros: {params}")
+                    return extrair_lista(resp.json())
 
-            if resp.status_code >= 500:
-                print(f"Tentativa {tentativa}/{tentativas_5xx} retornou {resp.status_code} ({resp.reason}).")
+                if resp.status_code >= 500:
+                    print(f"Tentativa {tentativa}/{tentativas_5xx} retornou {resp.status_code} ({resp.reason}).")
+                    ultimo_erro = (resp.status_code, resp.url, resp.text)
+                    if tentativa < tentativas_5xx:
+                        time.sleep(5 * (2 ** (tentativa - 1)))
+                    continue
+
+                print(f"Tentativa falhou ({resp.status_code}) em {url.split('/')[-2]} com {params} -> {resp.text[:300]}")
                 ultimo_erro = (resp.status_code, resp.url, resp.text)
-                if tentativa < tentativas_5xx:
-                    time.sleep(5 * (2 ** (tentativa - 1)))
-                continue
-
-            print(f"Tentativa falhou ({resp.status_code}) com {params} -> {resp.text[:300]}")
-            ultimo_erro = (resp.status_code, resp.url, resp.text)
-            break
+                break
 
     status, req_url, corpo = ultimo_erro
     raise RuntimeError(f"Falha {status} na ANA em {req_url}. Resposta: {corpo}")
