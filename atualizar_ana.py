@@ -1,42 +1,53 @@
 import json
 import os
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import requests
 
 BASE_URL = "https://www.ana.gov.br/hidrowebservice/EstacoesTelemetricas"
 ESTACAO_PADRAO = "58730001"  # GUARANI - Rio Pomba
+ARQUIVO_SAIDA = Path("dados_ana_pomba.json")
 
 
-def obter_token(identificador: str, senha: str) -> str:
+def obter_token(identificador: str, senha: str, tentativas: int = 3) -> str:
     url = f"{BASE_URL}/OAUth/v1"
     headers = {
         "Identificador": identificador,
         "Senha": senha,
         "Accept": "application/json",
     }
-    resp = requests.get(url, headers=headers, timeout=30)
+
+    for tentativa in range(1, tentativas + 1):
+        resp = requests.get(url, headers=headers, timeout=30)
+        if resp.status_code < 500:
+            resp.raise_for_status()
+            payload = resp.json()
+
+            items = payload.get("items") if isinstance(payload, dict) else None
+            if isinstance(items, list) and items:
+                item = items[0]
+            elif isinstance(items, dict):
+                item = items
+            else:
+                item = payload if isinstance(payload, dict) else {}
+
+            token = (
+                item.get("tokenautenticacao")
+                or item.get("TokenAutenticacao")
+                or item.get("token")
+                or payload.get("tokenautenticacao")
+                or payload.get("token")
+            )
+            if not token:
+                raise RuntimeError(f"Token não encontrado na resposta de /OAUth/v1: {payload}")
+            return token
+
+        print(f"Tentativa {tentativa}/{tentativas} em /OAUth/v1 retornou {resp.status_code} ({resp.reason}).")
+        if tentativa < tentativas:
+            time.sleep(5 * (2 ** (tentativa - 1)))
+
     resp.raise_for_status()
-    payload = resp.json()
-
-    items = payload.get("items") if isinstance(payload, dict) else None
-    if isinstance(items, list) and items:
-        item = items[0]
-    elif isinstance(items, dict):
-        item = items
-    else:
-        item = payload if isinstance(payload, dict) else {}
-
-    token = (
-        item.get("tokenautenticacao")
-        or item.get("TokenAutenticacao")
-        or item.get("token")
-        or payload.get("tokenautenticacao")
-        or payload.get("token")
-    )
-    if not token:
-        raise RuntimeError(f"Token não encontrado na resposta de /OAUth/v1: {payload}")
-    return token
 
 
 def parse_float(valor):
@@ -58,7 +69,7 @@ def extrair_lista(data) -> list[dict]:
     return []
 
 
-def buscar_serie_adotada(token: str, codigo_estacao: str) -> list[dict]:
+def buscar_serie_adotada(token: str, codigo_estacao: str, tentativas_5xx: int = 3) -> list[dict]:
     url = f"{BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1"
     headers = {
         "Authorization": f"Bearer {token}",
@@ -97,13 +108,25 @@ def buscar_serie_adotada(token: str, codigo_estacao: str) -> list[dict]:
 
     ultimo_erro = None
     for params in candidatos_params:
-        resp = requests.get(url, headers=headers, params=params, timeout=45)
-        if resp.status_code == 200:
-            print(f"Sucesso com parâmetros: {list(params.keys())}")
-            return extrair_lista(resp.json())
+        for tentativa in range(1, tentativas_5xx + 1):
+            resp = requests.get(url, headers=headers, params=params, timeout=45)
+            if resp.status_code == 200:
+                print(f"Sucesso com parâmetros: {list(params.keys())}")
+                return extrair_lista(resp.json())
 
-        print(f"Tentativa falhou ({resp.status_code}) com {params} -> corpo: {resp.text[:500]}")
-        ultimo_erro = (resp.status_code, resp.url, resp.text)
+            if resp.status_code >= 500:
+                print(
+                    f"Tentativa {tentativa}/{tentativas_5xx} com {list(params.keys())} "
+                    f"retornou {resp.status_code} ({resp.reason})."
+                )
+                ultimo_erro = (resp.status_code, resp.url, resp.text)
+                if tentativa < tentativas_5xx:
+                    time.sleep(5 * (2 ** (tentativa - 1)))
+                continue
+
+            print(f"Tentativa falhou ({resp.status_code}) com {params} -> corpo: {resp.text[:500]}")
+            ultimo_erro = (resp.status_code, resp.url, resp.text)
+            break
 
     status, req_url, corpo = ultimo_erro
     raise RuntimeError(f"Falha {status} na ANA em {req_url}. Resposta: {corpo}")
@@ -156,8 +179,21 @@ def main():
     if not identificador or not senha:
         raise SystemExit("Erro: defina ANA_IDENTIFICADOR e ANA_SENHA nas variáveis de ambiente.")
 
-    token = obter_token(identificador, senha)
-    brutos = buscar_serie_adotada(token, codigo_estacao=codigo_estacao)
+    try:
+        token = obter_token(identificador, senha)
+        brutos = buscar_serie_adotada(token, codigo_estacao=codigo_estacao)
+    except requests.exceptions.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status and status >= 500 and ARQUIVO_SAIDA.exists():
+            print(f"Aviso: API da ANA retornou {status} após tentativas. Mantendo {ARQUIVO_SAIDA} existente.")
+            return
+        raise
+    except RuntimeError as exc:
+        if "Falha 5" in str(exc) and ARQUIVO_SAIDA.exists():
+            print(f"Aviso: {exc}. Mantendo {ARQUIVO_SAIDA} existente.")
+            return
+        raise
+
     serie = normalizar_registros(brutos)
 
     ultima = serie[-1] if serie else None
@@ -191,9 +227,8 @@ def main():
         "serie": serie[-96:],
     }
 
-    caminho_json = Path("dados_ana_pomba.json")
-    caminho_json.write_text(json.dumps(saida, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Salvo {caminho_json} com {len(saida['serie'])} registros da estação {codigo_estacao}.")
+    ARQUIVO_SAIDA.write_text(json.dumps(saida, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"Salvo {ARQUIVO_SAIDA} com {len(saida['serie'])} registros da estação {codigo_estacao}.")
 
 
 if __name__ == "__main__":
