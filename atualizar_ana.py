@@ -70,63 +70,55 @@ def extrair_lista(data) -> list[dict]:
 
 
 def buscar_serie_adotada(token: str, codigo_estacao: str, tentativas_5xx: int = 3) -> list[dict]:
-    url = f"{BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Accept": "*/*",
+        "Accept": "application/json",
     }
 
     agora_br = datetime.now(timezone(timedelta(hours=-3)))
-    data_busca = agora_br.strftime("%Y-%m-%d")
+    inicio_br = agora_br - timedelta(days=2)
+
+    data_ini_iso = inicio_br.strftime("%Y-%m-%d")
+    data_fim_iso = agora_br.strftime("%Y-%m-%d")
+    data_ini_br = inicio_br.strftime("%d/%m/%Y")
+    data_fim_br = agora_br.strftime("%d/%m/%Y")
+
+    endpoints = [
+        f"{BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1",
+        f"{BASE_URL}/HidroinfoanaSerieTelemetricaDetalhada/v1",
+    ]
 
     candidatos_params = [
-        {
-            "codigoEstacao": codigo_estacao,
-            "tipoFiltroDados": "DATA_LEITURA",
-            "dataBusca": data_busca,
-            "intervaloBusca": "DIAS_2",
-        },
-        {
-            "CodigoEstacao": codigo_estacao,
-            "TipoFiltroDados": "DATA_LEITURA",
-            "DataBusca": data_busca,
-            "IntervaloBusca": "DIAS_2",
-        },
-        {
-            "codigo_estacao": codigo_estacao,
-            "tipo_filtro_dados": "DATA_LEITURA",
-            "data_busca": data_busca,
-            "intervalo_busca": "DIAS_2",
-        },
-        {
-            "codigoEstacao": codigo_estacao,
-            "tipoFiltro": "DATA_LEITURA",
-            "data": data_busca,
-            "intervalo": "DIAS_2",
-        },
+        {"codigoEstacao": codigo_estacao, "dataInicial": data_ini_iso, "dataFinal": data_fim_iso},
+        {"codigoEstacao": codigo_estacao, "dataInicial": data_ini_br, "dataFinal": data_fim_br},
+        {"codEstacao": codigo_estacao, "dataInicial": data_ini_iso, "dataFinal": data_fim_iso},
+        {"codEstacao": codigo_estacao, "dataInicial": data_ini_br, "dataFinal": data_fim_br},
+        {"CodigoEstacao": codigo_estacao, "DataInicial": data_ini_iso, "DataFinal": data_fim_iso},
+        {"codigoEstacao": codigo_estacao},
     ]
 
     ultimo_erro = None
-    for params in candidatos_params:
-        for tentativa in range(1, tentativas_5xx + 1):
-            resp = requests.get(url, headers=headers, params=params, timeout=45)
-            if resp.status_code == 200:
-                print(f"Sucesso com parâmetros: {list(params.keys())}")
-                return extrair_lista(resp.json())
+    for url in endpoints:
+        for params in candidatos_params:
+            for tentativa in range(1, tentativas_5xx + 1):
+                resp = requests.get(url, headers=headers, params=params, timeout=45)
+                if resp.status_code == 200:
+                    print(f"Sucesso em {url.split('/')[-2]} com parâmetros: {list(params.keys())}")
+                    return extrair_lista(resp.json())
 
-            if resp.status_code >= 500:
-                print(
-                    f"Tentativa {tentativa}/{tentativas_5xx} com {list(params.keys())} "
-                    f"retornou {resp.status_code} ({resp.reason})."
-                )
+                if resp.status_code >= 500:
+                    print(
+                        f"Tentativa {tentativa}/{tentativas_5xx} em {url.split('/')[-2]} "
+                        f"retornou {resp.status_code} ({resp.reason})."
+                    )
+                    ultimo_erro = (resp.status_code, resp.url, resp.text)
+                    if tentativa < tentativas_5xx:
+                        time.sleep(5 * (2 ** (tentativa - 1)))
+                    continue
+
+                print(f"Tentativa falhou ({resp.status_code}) em {url.split('/')[-2]} com {params} -> {resp.text[:300]}")
                 ultimo_erro = (resp.status_code, resp.url, resp.text)
-                if tentativa < tentativas_5xx:
-                    time.sleep(5 * (2 ** (tentativa - 1)))
-                continue
-
-            print(f"Tentativa falhou ({resp.status_code}) com {params} -> corpo: {resp.text[:500]}")
-            ultimo_erro = (resp.status_code, resp.url, resp.text)
-            break
+                break
 
     status, req_url, corpo = ultimo_erro
     raise RuntimeError(f"Falha {status} na ANA em {req_url}. Resposta: {corpo}")
