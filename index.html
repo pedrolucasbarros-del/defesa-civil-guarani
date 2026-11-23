@@ -454,6 +454,7 @@
       if (iconRefresh) iconRefresh.classList.remove('fa-spin');
     }
 
+    // Função atualizada com a lógica do estágio de observação baseada na tabela de alertas
     function atualizarResumoGeral() {
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       const dataStr = new Date().toLocaleDateString('pt-BR', options);
@@ -483,6 +484,7 @@
         if (elTemp) elTemp.innerText = `${(tMinSum / count).toFixed(0)}°C / ${(tMaxSum / count).toFixed(0)}°C`;
         if (elUmid) elUmid.innerText = `${(uMinSum / count).toFixed(0)}% / ${(uMaxSum / count).toFixed(0)}%`;
 
+        // Classificação do Estágio de Observação baseada no Consenso
         const badge = document.getElementById('badge-estagio');
         const desc = document.getElementById('desc-estagio');
 
@@ -628,14 +630,6 @@
       if (mm < 25.0) return '#f97316';
       if (mm < 50.0) return '#dc2626';
       return '#9333ea';
-    }
-
-    // Escala de cores para acumulado diário em 24h (do verde ao vermelho)
-    function getColorByDailyAlert(mm) {
-      if (mm < 20) return '#10b981';      // Sem Alerta / Baixo (< 20 mm) -> Verde
-      if (mm < 50) return '#eab308';      // Amarelo / Perigo Potencial (20 a 50 mm) -> Amarelo
-      if (mm <= 100) return '#f97316';    // Laranja / Perigo (50 a 100 mm) -> Laranja
-      return '#dc2626';                   // Vermelho / Grande Perigo (> 100 mm) -> Vermelho
     }
 
     function renderizarGraficoHorario() {
@@ -785,7 +779,7 @@
         }
       }
 
-      const barColors = rainData.map(v => getColorByDailyAlert(v));
+      const barColors = rainData.map(v => getColorByIntensity(v));
 
       if (chartSemanalInstance) {
         chartSemanalInstance.destroy();
