@@ -58,7 +58,7 @@
     <header class="bg-[#0b1120] border-b border-[#1a2438] px-6 py-3.5 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
         <div class="flex items-center space-x-3.5">
-          <!-- Ícone de Chuva/Meteorologia -->
+          <!-- Ícone de Chuva/Meteorologia no lugar do Escudo -->
           <div class="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-600/30">
             <i class="fa-solid fa-cloud-showers-heavy text-lg"></i>
           </div>
@@ -136,44 +136,22 @@
             </div>
           </div>
 
-          <!-- CARD CEMADEN — CENTRO - PREFEITURA (312840201A) -->
-          <div id="card-cemaden-urbana" class="card-panel p-5 relative">
-            <div class="flex justify-between items-center gap-2 mb-2">
-              <span id="urbana-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CENTRO - PREFEITURA</span>
-              <select id="select-janela-urbana" onchange="atualizarVisualizacaoCemaden()" class="bg-[#080d1a] text-orange-400 border border-[#1c2942] text-[10px] rounded px-1.5 py-0.5 font-bold outline-none focus:border-orange-500 cursor-pointer">
-                <option value="acc1hr">1h</option>
-                <option value="acc3hr">3h</option>
-                <option value="acc6hr">6h</option>
-                <option value="acc12hr">12h</option>
-                <option value="acc24hr" selected>24h</option>
-                <option value="acc48hr">48h</option>
-                <option value="acc72hr">72h</option>
-                <option value="acc96hr">96h</option>
-                <option value="acc120hr">120h</option>
-              </select>
+          <div class="card-panel p-5 relative opacity-80">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">CEMADEN — Urbana</span>
+              <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">API Futura</span>
             </div>
-            <div id="urbana-valor" class="text-2xl font-black text-white mt-1">-- mm</div>
-            <p id="urbana-desc" class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
+            <div class="text-2xl font-black text-slate-300 mt-1">-- mm</div>
+            <p class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
           </div>
 
-          <!-- CARD CEMADEN — CACHOEIRA - UBS (312840202A) -->
-          <div id="card-cemaden-encosta" class="card-panel p-5 relative">
-            <div class="flex justify-between items-center gap-2 mb-2">
-              <span id="encosta-nome" class="text-xs font-bold uppercase tracking-wider text-slate-400 truncate">CACHOEIRA - UBS</span>
-              <select id="select-janela-encosta" onchange="atualizarVisualizacaoCemaden()" class="bg-[#080d1a] text-orange-400 border border-[#1c2942] text-[10px] rounded px-1.5 py-0.5 font-bold outline-none focus:border-orange-500 cursor-pointer">
-                <option value="acc1hr">1h</option>
-                <option value="acc3hr">3h</option>
-                <option value="acc6hr">6h</option>
-                <option value="acc12hr">12h</option>
-                <option value="acc24hr" selected>24h</option>
-                <option value="acc48hr">48h</option>
-                <option value="acc72hr">72h</option>
-                <option value="acc96hr">96h</option>
-                <option value="acc120hr">120h</option>
-              </select>
+          <div class="card-panel p-5 relative opacity-80">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">CEMADEN — Encosta</span>
+              <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">API Futura</span>
             </div>
-            <div id="encosta-valor" class="text-2xl font-black text-white mt-1">-- mm</div>
-            <p id="encosta-desc" class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
+            <div class="text-2xl font-black text-slate-300 mt-1">-- mm</div>
+            <p class="text-[11px] text-slate-500 pt-3 border-t border-[#182338] mt-2">Aguardando integração com telemetria oficial.</p>
           </div>
 
           <div class="card-panel p-5 relative opacity-80">
@@ -188,45 +166,21 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="card-panel p-5 space-y-4 flex flex-col justify-between">
-            <div class="space-y-4">
-              <!-- BLOCO 1: PREVISÃO DOS MODELOS -->
-              <div>
-                <div class="flex items-center justify-between pb-3 border-b border-[#182338] mb-3">
-                  <div>
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">ESTÁGIO DE OBSERVAÇÃO DIÁRIO</h2>
-                    <p class="text-[10px] font-bold text-orange-400 mt-0.5 uppercase tracking-wide">BASEADO NA MÉDIA DOS MODELOS METEOROLÓGICOS</p>
-                  </div>
-                  <span id="badge-estagio" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-600 text-white">Sem Alerta / Baixo</span>
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-[#182338] mb-4">
+                <div>
+                  <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">ESTÁGIO DE OBSERVAÇÃO DIÁRIO</h2>
+                  <p class="text-[10px] font-bold text-orange-400 mt-0.5 uppercase tracking-wide">BASEADO NA MÉDIA DOS MODELOS METEOROLÓGICOS</p>
                 </div>
-                <p id="desc-estagio" class="text-xs text-slate-300 leading-relaxed">
-                  Calculando status de alerta com base na média dos modelos globais...
-                </p>
+                <span id="badge-estagio" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-600 text-white">Sem Alerta / Baixo</span>
               </div>
-
-              <!-- BLOCO 2: INTENSIDADE HORÁRIA OBSERVADA (CEMADEN - ÚLTIMA 1H) -->
-              <div id="card-intensidade-horaria" class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338] border-l-4 border-l-emerald-500 space-y-2 transition-colors">
-                <div class="flex items-center justify-between gap-2">
-                  <div>
-                    <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-slate-200">INTENSIDADE PLUVIOMÉTRICA (1H)</h3>
-                    <p class="text-[9px] font-bold text-cyan-400 uppercase tracking-wide">TELEMETRIA CEMADEN • ÚLTIMA HORA</p>
-                  </div>
-                  <span id="badge-intensidade-1h" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-600 text-white whitespace-nowrap">
-                    Fraca (&lt;2 mm/h)
-                  </span>
-                </div>
-                <p id="desc-intensidade-1h" class="text-[11px] text-slate-300 leading-relaxed">
-                  Aguardando leitura horária das estações CEMADEN...
-                </p>
-                <div class="flex justify-between items-center text-[10px] text-slate-400 pt-1.5 border-t border-[#152036]">
-                  <span>Centro: <strong id="int-1h-centro" class="text-slate-200">-- mm/h</strong></span>
-                  <span>Cachoeira: <strong id="int-1h-cachoeira" class="text-slate-200">-- mm/h</strong></span>
-                </div>
-              </div>
+              <p id="desc-estagio" class="text-xs text-slate-300 leading-relaxed">
+                Calculando status de alerta com base na média dos modelos globais...
+              </p>
             </div>
-
             <div class="bg-[#080d1a] p-3 rounded-xl border border-[#182338] text-[11px] text-slate-400 space-y-1">
               <div class="flex justify-between"><span>Status da Rede:</span> <strong class="text-emerald-400">Operacional</strong></div>
-              <div class="flex justify-between"><span>Atualização:</span> <strong class="text-slate-200">Open-Meteo + CEMADEN</strong></div>
+              <div class="flex justify-between"><span>Atualização:</span> <strong class="text-slate-200">Automática Open-Meteo</strong></div>
             </div>
           </div>
 
@@ -364,13 +318,7 @@
       { id: 'meteofrance', name: 'MeteoFrance (Francês)', param: 'meteofrance_seamless', color: '#8b5cf6' }
     ];
 
-    const NOMES_ESTACOES_CEMADEN = {
-      '312840201A': 'CENTRO - PREFEITURA',
-      '312840202A': 'CACHOEIRA - UBS'
-    };
-
     let dadosGuardados = {};
-    let dadosCemadenCache = null;
     let chartHorarioInstance = null;
     let chartSemanalInstance = null;
 
@@ -494,139 +442,16 @@
               dadosGuardados[m.id] = resJson;
             }
           }
-        } catch (e) {}
+        } catch (e) {
+          // Erro silencioso em ambiente local
+        }
       }
-
-      await carregarCemaden();
 
       popularSeletoresDeData();
       renderizarGridModelos();
       atualizarResumoGeral();
       
       if (iconRefresh) iconRefresh.classList.remove('fa-spin');
-    }
-
-    // --- INTEGRAÇÃO COM CEMADEN (dados_cemaden.json) ---
-    async function carregarCemaden() {
-      try {
-        const res = await fetch(`./dados_cemaden.json?t=${Date.now()}`);
-        if (!res.ok) return;
-        const dados = await res.json();
-
-        if (dados.status !== 'ok') return;
-
-        dadosCemadenCache = dados;
-        atualizarVisualizacaoCemaden();
-      } catch (e) {
-        console.warn('Aguardando dados_cemaden.json');
-      }
-    }
-
-    function obterNomeEstacaoCemaden(est) {
-      const cod = String(est.codestacao || '').replace(/^G2-/, '').trim();
-      return NOMES_ESTACOES_CEMADEN[cod] || est.nome_oficial || `CEMADEN — ${cod}`;
-    }
-
-    function atualizarCardIntensidadeHoraria(valCentro1h, valCachoeira1h) {
-      const max1h = Math.max(valCentro1h, valCachoeira1h);
-      const card = document.getElementById('card-intensidade-horaria');
-      const badge = document.getElementById('badge-intensidade-1h');
-      const desc = document.getElementById('desc-intensidade-1h');
-      const elCentro = document.getElementById('int-1h-centro');
-      const elCachoeira = document.getElementById('int-1h-cachoeira');
-
-      if (elCentro) elCentro.innerText = `${valCentro1h.toFixed(1)} mm/h`;
-      if (elCachoeira) elCachoeira.innerText = `${valCachoeira1h.toFixed(1)} mm/h`;
-
-      if (!card || !badge || !desc) return;
-
-      // Reseta classes de borda e badge
-      card.className = 'bg-[#080d1a] p-3.5 rounded-xl border border-[#182338] border-l-4 space-y-2 transition-colors';
-      badge.className = 'px-2.5 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap';
-
-      if (max1h < 2.0) {
-        card.classList.add('border-l-emerald-500');
-        badge.classList.add('bg-emerald-500', 'text-slate-950');
-        badge.innerText = 'Fraca (<2 mm/h)';
-        desc.innerHTML = max1h === 0
-          ? `Sem registro de chuva na última hora (<strong>0.0 mm/h</strong>). Condição estável nas estações.`
-          : `Pico de <strong>${max1h.toFixed(1)} mm/h</strong> na última hora. Precipitação fraca, sem impacto operacional.`;
-      } else if (max1h < 10.0) {
-        card.classList.add('border-l-yellow-400');
-        badge.classList.add('bg-yellow-400', 'text-slate-950');
-        badge.innerText = 'Moderada (2 - 10 mm/h)';
-        desc.innerHTML = `Pico de <strong>${max1h.toFixed(1)} mm/h</strong> na última hora. Chuva moderada; atenção para acúmulo contínuo em áreas vulneráveis.`;
-      } else if (max1h < 25.0) {
-        card.classList.add('border-l-orange-500');
-        badge.classList.add('bg-orange-500', 'text-white');
-        badge.innerText = 'Forte (10 - 25 mm/h)';
-        desc.innerHTML = `Pico de <strong>${max1h.toFixed(1)} mm/h</strong> na última hora. Chuva forte com potencial para enxurradas rápidas e alagamentos pontuais.`;
-      } else if (max1h <= 50.0) {
-        card.classList.add('border-l-red-600');
-        badge.classList.add('bg-red-600', 'text-white');
-        badge.innerText = 'M. Forte (25 - 50 mm/h)';
-        desc.innerHTML = `Pico de <strong>${max1h.toFixed(1)} mm/h</strong> na última hora. Chuva muito forte; alto risco de alagamentos e movimentação de encostas.`;
-      } else {
-        card.classList.add('border-l-purple-600');
-        badge.classList.add('bg-purple-600', 'text-white');
-        badge.innerText = 'Extrema (>50 mm/h)';
-        desc.innerHTML = `Pico de <strong>${max1h.toFixed(1)} mm/h</strong> na última hora. Chuva extrema; alerta máximo para inundações severas e deslizamentos.`;
-      }
-    }
-
-    function atualizarVisualizacaoCemaden() {
-      if (!dadosCemadenCache) return;
-
-      const dados = dadosCemadenCache;
-      const bruto = (dados.estacoes && dados.estacoes.length > 0)
-        ? dados.estacoes
-        : (dados.acumulados_raw || []);
-
-      const lista = bruto
-        .filter(e => String(e.codestacao || '').includes('3128402'))
-        .sort((a, b) => String(a.codestacao).localeCompare(String(b.codestacao)));
-
-      const rotulos = {
-        'acc1hr': 'Última 1h',
-        'acc3hr': 'Últimas 3h',
-        'acc6hr': 'Últimas 6h',
-        'acc12hr': 'Últimas 12h',
-        'acc24hr': 'Últimas 24h',
-        'acc48hr': 'Últimas 48h',
-        'acc72hr': 'Últimas 72h',
-        'acc96hr': 'Últimas 96h',
-        'acc120hr': 'Últimas 120h'
-      };
-
-      let centro1h = 0;
-      let cachoeira1h = 0;
-
-      // Estação 1: CENTRO - PREFEITURA (312840201A)
-      if (lista.length > 0) {
-        const est1 = lista[0];
-        const chave1 = document.getElementById('select-janela-urbana')?.value || 'acc24hr';
-        const val1 = parseFloat(est1[chave1] ?? 0);
-        centro1h = parseFloat(est1.acc1hr ?? 0);
-
-        document.getElementById('urbana-nome').innerText = obterNomeEstacaoCemaden(est1);
-        document.getElementById('urbana-valor').innerText = `${val1.toFixed(1)} mm`;
-        document.getElementById('urbana-desc').innerText = `${rotulos[chave1]} • Cód: ${est1.codestacao} • ${dados.atualizado_em}`;
-      }
-
-      // Estação 2: CACHOEIRA - UBS (312840202A)
-      if (lista.length > 1) {
-        const est2 = lista[1];
-        const chave2 = document.getElementById('select-janela-encosta')?.value || 'acc24hr';
-        const val2 = parseFloat(est2[chave2] ?? 0);
-        cachoeira1h = parseFloat(est2.acc1hr ?? 0);
-
-        document.getElementById('encosta-nome').innerText = obterNomeEstacaoCemaden(est2);
-        document.getElementById('encosta-valor').innerText = `${val2.toFixed(1)} mm`;
-        document.getElementById('encosta-desc').innerText = `${rotulos[chave2]} • Cód: ${est2.codestacao} • ${dados.atualizado_em}`;
-      }
-
-      // Atualiza o sub-card de Intensidade Pluviométrica (1h)
-      atualizarCardIntensidadeHoraria(centro1h, cachoeira1h);
     }
 
     function atualizarResumoGeral() {
@@ -805,6 +630,14 @@
       return '#9333ea';
     }
 
+    // Escala de cores para acumulado diário em 24h (do verde ao vermelho)
+    function getColorByDailyAlert(mm) {
+      if (mm < 20) return '#10b981';      // Sem Alerta / Baixo (< 20 mm) -> Verde
+      if (mm < 50) return '#eab308';      // Amarelo / Perigo Potencial (20 a 50 mm) -> Amarelo
+      if (mm <= 100) return '#f97316';    // Laranja / Perigo (50 a 100 mm) -> Laranja
+      return '#dc2626';                   // Vermelho / Grande Perigo (> 100 mm) -> Vermelho
+    }
+
     function renderizarGraficoHorario() {
       const selectEl = document.getElementById('select-modelo-grafico');
       const selectData = document.getElementById('select-data-horario');
@@ -952,7 +785,7 @@
         }
       }
 
-      const barColors = rainData.map(v => getColorByIntensity(v));
+      const barColors = rainData.map(v => getColorByDailyAlert(v));
 
       if (chartSemanalInstance) {
         chartSemanalInstance.destroy();
