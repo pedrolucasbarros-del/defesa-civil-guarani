@@ -114,6 +114,10 @@
           <i class="fa-solid fa-chart-line"></i>
           <span>Previsão 7 Dias (Gráficos)</span>
         </button>
+        <button onclick="switchTab('rio-pomba')" id="tab-btn-rio-pomba" class="tab-btn py-3 flex items-center space-x-2 hover:text-slate-200">
+          <i class="fa-solid fa-water text-sky-400"></i>
+          <span>Rio Pomba (ANA)</span>
+        </button>
       </div>
 
       <!-- ABA 1: PAINEL GERAL -->
@@ -338,6 +342,66 @@
         </div>
       </div>
 
+      <!-- ABA 5: RIO POMBA (ANA) -->
+      <div id="tab-rio-pomba" class="tab-content space-y-5">
+        <div class="card-panel p-5 space-y-5">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-4 border-b border-[#182338]">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-water text-sky-400"></i>
+                Nível do Rio Pomba — Estação GUARANI (58730001)
+              </h2>
+              <p id="ana-meta" class="text-xs text-slate-400 mt-1">Carregando dados_ana_pomba.json...</p>
+            </div>
+            <span id="ana-status-badge" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-slate-700 text-slate-200">
+              Aguardando leitura
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+            <!-- Régua hidrométrica vertical -->
+            <div class="md:col-span-3 bg-[#080d1a] p-4 rounded-xl border border-[#182338] flex flex-col items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Régua de Cota (cm)</span>
+              <div class="relative w-24 h-64 rounded-xl overflow-hidden border border-[#243454] bg-gradient-to-t from-emerald-500 via-amber-400 to-red-600">
+                <div id="ana-marcador-nivel" style="bottom: 0%;" class="absolute left-0 right-0 h-1.5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.95)] transition-all duration-300"></div>
+              </div>
+              <span id="ana-escala-legenda" class="text-[10px] font-mono text-slate-500 mt-3">Escala: 100 cm a 600 cm</span>
+            </div>
+
+            <!-- Indicadores e faixas de referência -->
+            <div class="md:col-span-9 flex flex-col justify-between space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338]">
+                  <span class="text-[10px] font-bold uppercase text-slate-400 block">Cota Atual</span>
+                  <span id="ana-cota-valor" class="text-2xl font-black text-sky-400">-- cm</span>
+                </div>
+                <div class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338]">
+                  <span class="text-[10px] font-bold uppercase text-slate-400 block">Tendência</span>
+                  <span id="ana-tendencia-texto" class="text-sm font-bold text-slate-200 block mt-1.5">--</span>
+                </div>
+                <div class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338]">
+                  <span class="text-[10px] font-bold uppercase text-slate-400 block">Chuva (Última Leitura)</span>
+                  <span id="ana-chuva-valor" class="text-sm font-bold text-cyan-300 block mt-1.5">-- mm</span>
+                </div>
+              </div>
+
+              <div class="bg-[#080d1a] p-4 rounded-xl border border-[#182338] space-y-2 text-xs">
+                <div class="font-bold uppercase tracking-wider text-slate-400 text-[10px]">Cotas de Referência Operacional (Ajustáveis)</div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                  <div class="text-yellow-300"><strong>Atenção:</strong> <span id="ref-atencao">320 cm</span></div>
+                  <div class="text-orange-400"><strong>Alerta:</strong> <span id="ref-alerta">400 cm</span></div>
+                  <div class="text-red-400"><strong>Inundação:</strong> <span id="ref-inundacao">500 cm</span></div>
+                </div>
+              </div>
+
+              <div id="ana-historico-lista" class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338] text-xs text-slate-300 font-mono">
+                Últimas leituras: --
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -365,6 +429,15 @@
     const NOMES_ESTACOES_CEMADEN = {
       '312840201A': 'CENTRO - PREFEITURA',
       '312840202A': 'CACHOEIRA - UBS'
+    };
+
+    // Ajuste os valores abaixo (em cm) conforme as cotas oficiais para Guarani (estação 58730001)
+    const COTAS_POMBA = {
+      minimoEscala: 100,
+      atencao: 320,
+      alerta: 400,
+      inundacao: 500,
+      maximoEscala: 600
     };
 
     let dadosGuardados = {};
@@ -456,7 +529,7 @@
     }
 
     function switchTab(tabId) {
-      const tabs = ['geral', 'modelos', 'graficos', 'semanal'];
+      const tabs = ['geral', 'modelos', 'graficos', 'semanal', 'rio-pomba'];
       tabs.forEach(id => {
         const el = document.getElementById(`tab-${id}`);
         const btn = document.getElementById(`tab-btn-${id}`);
@@ -475,6 +548,8 @@
         setTimeout(renderizarGraficoSemanal, 50);
       } else if (tabId === 'modelos') {
         renderizarGridModelos();
+      } else if (tabId === 'rio-pomba') {
+        carregarDadosAnaPomba();
       }
     }
 
@@ -495,13 +570,104 @@
         } catch (e) {}
       }
 
-      await carregarCemaden();
+      await Promise.all([carregarCemaden(), carregarDadosAnaPomba()]);
 
       popularSeletoresDeData();
       renderizarGridModelos();
       atualizarResumoGeral();
       
       if (iconRefresh) iconRefresh.classList.remove('fa-spin');
+    }
+
+    // --- INTEGRAÇÃO COM ANA / RIO POMBA (dados_ana_pomba.json) ---
+    function classificarNivelPomba(cotaCm) {
+      if (cotaCm == null || !Number.isFinite(cotaCm)) {
+        return { rotulo: 'Sem leitura', classes: 'bg-slate-700 text-slate-200' };
+      }
+      if (cotaCm >= COTAS_POMBA.inundacao) {
+        return { rotulo: 'Inundação', classes: 'bg-red-600 text-white' };
+      }
+      if (cotaCm >= COTAS_POMBA.alerta) {
+        return { rotulo: 'Alerta', classes: 'bg-orange-500 text-white' };
+      }
+      if (cotaCm >= COTAS_POMBA.atencao) {
+        return { rotulo: 'Atenção', classes: 'bg-amber-400 text-slate-950' };
+      }
+      return { rotulo: 'Normal', classes: 'bg-emerald-600 text-white' };
+    }
+
+    async function carregarDadosAnaPomba() {
+      const metaEl = document.getElementById('ana-meta');
+      const badgeEl = document.getElementById('ana-status-badge');
+      const cotaEl = document.getElementById('ana-cota-valor');
+      const tendEl = document.getElementById('ana-tendencia-texto');
+      const chuvaEl = document.getElementById('ana-chuva-valor');
+      const marcadorEl = document.getElementById('ana-marcador-nivel');
+      const histEl = document.getElementById('ana-historico-lista');
+      const escalaEl = document.getElementById('ana-escala-legenda');
+
+      if (document.getElementById('ref-atencao')) document.getElementById('ref-atencao').innerText = `${COTAS_POMBA.atencao} cm`;
+      if (document.getElementById('ref-alerta')) document.getElementById('ref-alerta').innerText = `${COTAS_POMBA.alerta} cm`;
+      if (document.getElementById('ref-inundacao')) document.getElementById('ref-inundacao').innerText = `${COTAS_POMBA.inundacao} cm`;
+      if (escalaEl) escalaEl.innerText = `Escala: ${COTAS_POMBA.minimoEscala} cm a ${COTAS_POMBA.maximoEscala} cm`;
+
+      try {
+        const res = await fetch(`./dados_ana_pomba.json?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const dados = await res.json();
+
+        const ultima = dados.ultima_leitura || {};
+        const cotaRaw = ultima.cota_cm;
+        const cota = cotaRaw === null || cotaRaw === undefined ? NaN : Number(cotaRaw);
+        const status = classificarNivelPomba(cota);
+
+        if (metaEl) {
+          const cod = dados.estacao?.codigo || '58730001';
+          const nome = dados.estacao?.nome || 'GUARANI';
+          metaEl.innerText = `Estação ${nome} (${cod}) • Leitura: ${ultima.data_hora_medicao || '--'}`;
+        }
+
+        if (badgeEl) {
+          badgeEl.className = `px-3 py-1 rounded-full text-xs font-black uppercase ${status.classes}`;
+          badgeEl.innerText = status.rotulo;
+        }
+
+        if (cotaEl) {
+          cotaEl.innerText = Number.isFinite(cota) ? `${cota.toFixed(1)} cm` : '-- cm';
+        }
+
+        if (tendEl) {
+          const varCm = dados.variacao_ultima_leitura_cm;
+          const varTxt = typeof varCm === 'number' && Number.isFinite(varCm)
+            ? ` (${varCm >= 0 ? '+' : ''}${varCm} cm)`
+            : '';
+          tendEl.innerText = `${dados.tendencia || 'sem_dados'}${varTxt}`;
+        }
+
+        if (chuvaEl) {
+          const chuva = typeof ultima.chuva_mm === 'number' && Number.isFinite(ultima.chuva_mm)
+            ? `${ultima.chuva_mm.toFixed(1)} mm`
+            : '-- mm';
+          chuvaEl.innerText = chuva;
+        }
+
+        if (marcadorEl && Number.isFinite(cota)) {
+          const faixa = Math.max(1, COTAS_POMBA.maximoEscala - COTAS_POMBA.minimoEscala);
+          const pct = Math.max(0, Math.min(100, ((cota - COTAS_POMBA.minimoEscala) / faixa) * 100));
+          marcadorEl.style.bottom = `${pct}%`;
+        }
+
+        if (histEl && Array.isArray(dados.serie) && dados.serie.length > 0) {
+          const ultimos = dados.serie.slice(-4).reverse().map((item) => {
+            const hora = item.data_hora_medicao ? item.data_hora_medicao.slice(11, 16) : '--:--';
+            const val = item.cota_cm !== null && item.cota_cm !== undefined ? `${item.cota_cm} cm` : '-- cm';
+            return `${hora}: ${val}`;
+          });
+          histEl.innerText = `Últimas leituras: ${ultimos.join(' • ')}`;
+        }
+      } catch (err) {
+        if (metaEl) metaEl.innerText = `Aguardando dados_ana_pomba.json (${err.message})`;
+      }
     }
 
     // --- INTEGRAÇÃO COM CEMADEN (dados_cemaden.json) ---
