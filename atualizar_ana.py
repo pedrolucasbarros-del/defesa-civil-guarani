@@ -184,13 +184,13 @@ def main():
         brutos = buscar_serie_adotada(token, codigo_estacao=codigo_estacao)
     except requests.exceptions.HTTPError as exc:
         status = exc.response.status_code if exc.response is not None else None
-        if status and status >= 500 and ARQUIVO_SAIDA.exists():
-            print(f"Aviso: API da ANA retornou {status} após tentativas. Mantendo {ARQUIVO_SAIDA} existente.")
+        if status and status >= 500:
+            print(f"Aviso: API da ANA retornou {status}. Encerrando sem falha do workflow.")
             return
         raise
     except RuntimeError as exc:
-        if "Falha 5" in str(exc) and ARQUIVO_SAIDA.exists():
-            print(f"Aviso: {exc}. Mantendo {ARQUIVO_SAIDA} existente.")
+        if "Falha 5" in str(exc):
+            print(f"Aviso: {exc}. Encerrando sem falha do workflow.")
             return
         raise
 
