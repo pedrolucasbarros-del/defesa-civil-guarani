@@ -2,7 +2,7 @@ name: Atualizar Dados ANA - Rio Pomba
 
 on:
   schedule:
-    # Roda a cada 30 minutos (em UTC). Ajuste conforme a frequência desejada.
+    # Roda a cada 30 minutos (em UTC)
     - cron: "*/30 * * * *"
   workflow_dispatch:
     # Permite disparar manualmente pela aba Actions no GitHub
@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Instalar dependências
         run: |
