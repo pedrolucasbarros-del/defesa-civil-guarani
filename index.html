@@ -46,6 +46,96 @@
       display: block;
     }
 
+    /* Régua graduada em faixas nítidas (100 a 600 cm = 500 cm totais) */
+    .regua-graduada-wrap {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      height: 240px;
+      width: 100%;
+    }
+
+    .regua-marcas-esq {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #94a3b8;
+      padding: 2px 0;
+    }
+
+    .regua-faixas {
+      position: relative;
+      flex: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #243454;
+    }
+
+    .faixa-graduada {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    /* 500..600 = 20% | 400..500 = 20% | 300..400 = 20% | 100..300 = 40% */
+    .faixa-inundacao {
+      height: 20%;
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .faixa-alerta {
+      height: 20%;
+      background: #ea580c;
+      color: #ffffff;
+    }
+
+    .faixa-atencao {
+      height: 20%;
+      background: #eab308;
+      color: #090d16;
+    }
+
+    .faixa-normal {
+      height: 40%;
+      background: #059669;
+      color: #ecfdf5;
+    }
+
+    .regua-ponteiro {
+      position: absolute;
+      left: -2px;
+      right: -2px;
+      height: 3px;
+      background: #ffffff;
+      box-shadow: 0 0 0 1.5px #070b14, 0 0 10px rgba(255, 255, 255, 0.95);
+      transition: bottom 0.45s ease;
+      z-index: 4;
+    }
+
+    .regua-ponteiro-tag {
+      position: absolute;
+      left: 50%;
+      top: -20px;
+      transform: translateX(-50%);
+      background: #070b14;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #070b14; }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
@@ -345,7 +435,7 @@
         </div>
       </div>
 
-      <!-- ABA 5: RIO POMBA (ANA) -->
+      <!-- ABA 5: RIO POMBA (ANA / SACE-SGB) -->
       <div id="tab-rio-pomba" class="tab-content space-y-5">
         <div class="card-panel p-5 space-y-5">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-4 border-b border-[#182338]">
@@ -362,38 +452,67 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-            <!-- Régua hidrométrica vertical -->
+            <!-- Régua hidrométrica vertical graduada por faixas nítidas -->
             <div class="md:col-span-3 bg-[#080d1a] p-4 rounded-xl border border-[#182338] flex flex-col items-center justify-between">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Régua de Cota (cm)</span>
-              <div class="relative w-24 h-64 rounded-xl overflow-hidden border border-[#243454] bg-gradient-to-t from-emerald-500 via-amber-400 to-red-600">
-                <div id="ana-marcador-nivel" style="bottom: 0%;" class="absolute left-0 right-0 h-1.5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.95)] transition-all duration-300"></div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Régua Graduada (cm)</span>
+              <div class="regua-graduada-wrap">
+                <div class="regua-marcas-esq" aria-hidden="true">
+                  <span>600</span>
+                  <span>500</span>
+                  <span>400</span>
+                  <span>300</span>
+                  <span>200</span>
+                  <span>100</span>
+                </div>
+
+                <div class="regua-faixas">
+                  <div class="faixa-graduada faixa-inundacao"><span>500+</span></div>
+                  <div class="faixa-graduada faixa-alerta"><span>400</span></div>
+                  <div class="faixa-graduada faixa-atencao"><span>300</span></div>
+                  <div class="faixa-graduada faixa-normal"><span>&lt;300</span></div>
+
+                  <div id="ana-marcador-nivel" style="bottom: 0%;" class="regua-ponteiro">
+                    <span id="ana-ponteiro-valor" class="regua-ponteiro-tag">-- cm</span>
+                  </div>
+                </div>
               </div>
               <span id="ana-escala-legenda" class="text-[10px] font-mono text-slate-500 mt-3">Escala: 100 cm a 600 cm</span>
             </div>
 
-            <!-- Indicadores e faixas de referência -->
+            <!-- Indicadores e faixas de referência (sem card de chuva, coberta pelo Cemaden) -->
             <div class="md:col-span-9 flex flex-col justify-between space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338]">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="bg-[#080d1a] p-4 rounded-xl border border-[#182338]">
                   <span class="text-[10px] font-bold uppercase text-slate-400 block">Cota Atual</span>
-                  <span id="ana-cota-valor" class="text-2xl font-black text-sky-400">-- cm</span>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="ana-cota-valor" class="text-2xl font-black text-sky-400">-- cm</span>
+                    <span id="ana-cota-metros" class="text-xs font-mono text-slate-400">-- m</span>
+                  </div>
+                  <p id="ana-margem-ref" class="text-[11px] text-slate-400 mt-1.5">Margem até atenção: -- cm</p>
                 </div>
-                <div class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338]">
-                  <span class="text-[10px] font-bold uppercase text-slate-400 block">Tendência</span>
-                  <span id="ana-tendencia-texto" class="text-sm font-bold text-slate-200 block mt-1.5">--</span>
-                </div>
-                <div class="bg-[#080d1a] p-3.5 rounded-xl border border-[#182338]">
-                  <span class="text-[10px] font-bold uppercase text-slate-400 block">Chuva (Última Leitura)</span>
-                  <span id="ana-chuva-valor" class="text-sm font-bold text-cyan-300 block mt-1.5">-- mm</span>
+
+                <div class="bg-[#080d1a] p-4 rounded-xl border border-[#182338]">
+                  <span class="text-[10px] font-bold uppercase text-slate-400 block">Tendência &amp; Variação</span>
+                  <span id="ana-tendencia-texto" class="text-lg font-bold text-slate-200 block mt-1">--</span>
+                  <span class="text-[11px] text-slate-500 block mt-1">Chuva monitorada nas estações CEMADEN</span>
                 </div>
               </div>
 
               <div class="bg-[#080d1a] p-4 rounded-xl border border-[#182338] space-y-2 text-xs">
                 <div class="font-bold uppercase tracking-wider text-slate-400 text-[10px]">Cotas de Referência Operacional (Ajustáveis)</div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-                  <div class="text-yellow-300"><strong>Atenção:</strong> <span id="ref-atencao">300 cm</span></div>
-                  <div class="text-orange-400"><strong>Alerta:</strong> <span id="ref-alerta">400 cm</span></div>
-                  <div class="text-red-400"><strong>Inundação:</strong> <span id="ref-inundacao">500 cm</span></div>
+                  <div class="flex items-center gap-2 text-yellow-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 inline-block"></span>
+                    <strong>Atenção:</strong> <span id="ref-atencao">300 cm</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-orange-400">
+                    <span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span>
+                    <strong>Alerta:</strong> <span id="ref-alerta">400 cm</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-red-400">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>
+                    <strong>Inundação:</strong> <span id="ref-inundacao">500 cm</span>
+                  </div>
                 </div>
               </div>
 
@@ -402,6 +521,31 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Incorporação do SACE / SGB com fallback para nova aba -->
+        <div class="card-panel overflow-hidden">
+          <div class="flex justify-between items-center gap-3 px-4 py-3 bg-[#111a2e] border-b border-[#182338] text-xs">
+            <span class="font-bold text-slate-200">
+              <i class="fa-solid fa-up-right-from-square text-sky-400 mr-1.5"></i>
+              SACE / SGB — Relatório Oficial de Níveis (Guarani - MG)
+            </span>
+            <a
+              href="https://sace.sgb.gov.br/niveis/relatorio.php?apenas_grafico=sim&bacia=pomba&pm=7&s=11&sr=10"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sky-400 hover:text-sky-300 font-bold underline"
+            >
+              Abrir no SACE / SGB ↗
+            </a>
+          </div>
+          <iframe
+            src="https://sace.sgb.gov.br/niveis/relatorio.php?apenas_grafico=sim&bacia=pomba&pm=7&s=11&sr=10"
+            class="w-full h-[520px] border-0 bg-white block"
+            title="SACE SGB - Rio Pomba - Guarani"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
         </div>
       </div>
 
@@ -582,7 +726,7 @@
       if (iconRefresh) iconRefresh.classList.remove('fa-spin');
     }
 
-    // --- INTEGRAÇÃO COM ANA / RIO POMBA (dados_ana_pomba.json) ---
+    // --- INTEGRAÇÃO COM ANA / SACE-SGB / RIO POMBA (dados_ana_pomba.json) ---
     function classificarNivelPomba(cotaCm) {
       if (cotaCm == null || !Number.isFinite(cotaCm)) {
         return { rotulo: 'Sem leitura', classes: 'bg-slate-700 text-slate-200' };
@@ -599,13 +743,29 @@
       return { rotulo: 'Normal', classes: 'bg-emerald-600 text-white' };
     }
 
+    function descreverMargemPomba(cotaCm) {
+      if (!Number.isFinite(cotaCm)) return 'Margem até atenção: -- cm';
+      if (cotaCm >= COTAS_POMBA.inundacao) {
+        return `Acima da cota de Inundação (+${(cotaCm - COTAS_POMBA.inundacao).toFixed(1)} cm)`;
+      }
+      if (cotaCm >= COTAS_POMBA.alerta) {
+        return `Faltam ${(COTAS_POMBA.inundacao - cotaCm).toFixed(1)} cm para Inundação (${COTAS_POMBA.inundacao} cm)`;
+      }
+      if (cotaCm >= COTAS_POMBA.atencao) {
+        return `Faltam ${(COTAS_POMBA.alerta - cotaCm).toFixed(1)} cm para Alerta (${COTAS_POMBA.alerta} cm)`;
+      }
+      return `Faltam ${(COTAS_POMBA.atencao - cotaCm).toFixed(1)} cm para Atenção (${COTAS_POMBA.atencao} cm)`;
+    }
+
     async function carregarDadosAnaPomba() {
       const metaEl = document.getElementById('ana-meta');
       const badgeEl = document.getElementById('ana-status-badge');
       const cotaEl = document.getElementById('ana-cota-valor');
+      const metrosEl = document.getElementById('ana-cota-metros');
+      const margemEl = document.getElementById('ana-margem-ref');
       const tendEl = document.getElementById('ana-tendencia-texto');
-      const chuvaEl = document.getElementById('ana-chuva-valor');
       const marcadorEl = document.getElementById('ana-marcador-nivel');
+      const ponteiroTagEl = document.getElementById('ana-ponteiro-valor');
       const histEl = document.getElementById('ana-historico-lista');
       const escalaEl = document.getElementById('ana-escala-legenda');
 
@@ -651,19 +811,19 @@
         }
 
         if (cotaEl) cotaEl.innerText = cotaFormatada;
-        if (tendEl) tendEl.innerText = `${dados.tendencia || 'sem_dados'}${varTxt}`;
-
-        if (chuvaEl) {
-          const chuva = typeof ultima.chuva_mm === 'number' && Number.isFinite(ultima.chuva_mm)
-            ? `${ultima.chuva_mm.toFixed(1)} mm`
-            : '-- mm';
-          chuvaEl.innerText = chuva;
+        if (metrosEl && Number.isFinite(cota)) {
+          metrosEl.innerText = `(${(cota / 100).toFixed(2).replace('.', ',')} m)`;
         }
+        if (margemEl) margemEl.innerText = descreverMargemPomba(cota);
+        if (tendEl) tendEl.innerText = `${dados.tendencia || 'sem_dados'}${varTxt}`;
 
         if (marcadorEl && Number.isFinite(cota)) {
           const faixa = Math.max(1, COTAS_POMBA.maximoEscala - COTAS_POMBA.minimoEscala);
           const pct = Math.max(0, Math.min(100, ((cota - COTAS_POMBA.minimoEscala) / faixa) * 100));
           marcadorEl.style.bottom = `${pct}%`;
+        }
+        if (ponteiroTagEl && Number.isFinite(cota)) {
+          ponteiroTagEl.innerText = `${cota.toFixed(1)} cm`;
         }
 
         if (histEl && Array.isArray(dados.serie) && dados.serie.length > 0) {
