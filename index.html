@@ -435,7 +435,7 @@
         </div>
       </div>
 
-      <!-- ABA 5: RIO POMBA (ANA / SACE-SGB) -->
+      <!-- ABA 5: RIO POMBA (ANA) -->
       <div id="tab-rio-pomba" class="tab-content space-y-5">
         <div class="card-panel p-5 space-y-5">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-4 border-b border-[#182338]">
@@ -521,31 +521,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Incorporação do SACE / SGB com fallback para nova aba -->
-        <div class="card-panel overflow-hidden">
-          <div class="flex justify-between items-center gap-3 px-4 py-3 bg-[#111a2e] border-b border-[#182338] text-xs">
-            <span class="font-bold text-slate-200">
-              <i class="fa-solid fa-up-right-from-square text-sky-400 mr-1.5"></i>
-              SACE / SGB — Relatório Oficial de Níveis (Guarani - MG)
-            </span>
-            <a
-              href="https://sace.sgb.gov.br/niveis/relatorio.php?apenas_grafico=sim&bacia=pomba&pm=7&s=11&sr=10"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-sky-400 hover:text-sky-300 font-bold underline"
-            >
-              Abrir no SACE / SGB ↗
-            </a>
-          </div>
-          <iframe
-            src="https://sace.sgb.gov.br/niveis/relatorio.php?apenas_grafico=sim&bacia=pomba&pm=7&s=11&sr=10"
-            class="w-full h-[520px] border-0 bg-white block"
-            title="SACE SGB - Rio Pomba - Guarani"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-          ></iframe>
         </div>
       </div>
 
@@ -726,7 +701,7 @@
       if (iconRefresh) iconRefresh.classList.remove('fa-spin');
     }
 
-    // --- INTEGRAÇÃO COM ANA / SACE-SGB / RIO POMBA (dados_ana_pomba.json) ---
+    // --- INTEGRAÇÃO COM ANA / RIO POMBA (dados_ana_pomba.json) ---
     function classificarNivelPomba(cotaCm) {
       if (cotaCm == null || !Number.isFinite(cotaCm)) {
         return { rotulo: 'Sem leitura', classes: 'bg-slate-700 text-slate-200' };
