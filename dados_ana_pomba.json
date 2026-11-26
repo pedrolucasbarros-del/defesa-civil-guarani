@@ -9,7 +9,7 @@
   "fonte": "SACE / SGB",
   "situacao": "Normal",
   "ultima_medicao_texto": "25/11/2026 22:45",
-  "atualizado_em_utc": "2026-11-26T02:14:18.572193+00:00",
+  "atualizado_em_utc": "2026-11-26T03:27:21.651855+00:00",
   "ultima_leitura": {
     "data_hora_medicao": "2026-11-25 22:45:00",
     "cota_cm": 226.9,
@@ -21,7 +21,7 @@
   },
   "variacao_ultima_leitura_cm": -0.1,
   "tendencia": "estavel",
-  "total_registros": 2261,
+  "total_registros": 2233,
   "serie": [
     {
       "data_hora_medicao": "2026-11-24 22:00:00",
