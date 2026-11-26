@@ -8,57 +8,21 @@
   },
   "fonte": "SACE / SGB",
   "situacao": "Normal",
-  "ultima_medicao_texto": "26/11/2026 05:45",
-  "atualizado_em_utc": "2026-11-26T09:58:14.051426+00:00",
+  "ultima_medicao_texto": "26/11/2026 06:45",
+  "atualizado_em_utc": "2026-11-26T10:55:46.540509+00:00",
   "ultima_leitura": {
-    "data_hora_medicao": "2026-11-26 05:45:00",
-    "cota_cm": 221.4,
+    "data_hora_medicao": "2026-11-26 06:45:00",
+    "cota_cm": 220.7,
     "vazao_m3s": null,
-    "chuva_mm": 221.4,
+    "chuva_mm": 220.7,
     "status_cota": "0",
     "status_vazao": "",
     "status_chuva": "0"
   },
-  "variacao_ultima_leitura_cm": 0.3,
+  "variacao_ultima_leitura_cm": -0.4,
   "tendencia": "estavel",
-  "total_registros": 2257,
+  "total_registros": 2261,
   "serie": [
-    {
-      "data_hora_medicao": "2026-11-25 05:00:00",
-      "cota_cm": 261.6,
-      "vazao_m3s": null,
-      "chuva_mm": 261.6,
-      "status_cota": "0",
-      "status_vazao": "",
-      "status_chuva": "0"
-    },
-    {
-      "data_hora_medicao": "2026-11-25 05:15:00",
-      "cota_cm": 260.2,
-      "vazao_m3s": null,
-      "chuva_mm": 260.2,
-      "status_cota": "0",
-      "status_vazao": "",
-      "status_chuva": "0"
-    },
-    {
-      "data_hora_medicao": "2026-11-25 05:30:00",
-      "cota_cm": 259.7,
-      "vazao_m3s": null,
-      "chuva_mm": 259.7,
-      "status_cota": "0",
-      "status_vazao": "",
-      "status_chuva": "0"
-    },
-    {
-      "data_hora_medicao": "2026-11-25 05:45:00",
-      "cota_cm": 258.7,
-      "vazao_m3s": null,
-      "chuva_mm": 258.7,
-      "status_cota": "0",
-      "status_vazao": "",
-      "status_chuva": "0"
-    },
     {
       "data_hora_medicao": "2026-11-25 06:00:00",
       "cota_cm": 258.5,
@@ -883,6 +847,42 @@
       "cota_cm": 221.4,
       "vazao_m3s": null,
       "chuva_mm": 221.4,
+      "status_cota": "0",
+      "status_vazao": "",
+      "status_chuva": "0"
+    },
+    {
+      "data_hora_medicao": "2026-11-26 06:00:00",
+      "cota_cm": 221.2,
+      "vazao_m3s": null,
+      "chuva_mm": 221.2,
+      "status_cota": "0",
+      "status_vazao": "",
+      "status_chuva": "0"
+    },
+    {
+      "data_hora_medicao": "2026-11-26 06:15:00",
+      "cota_cm": 221.1,
+      "vazao_m3s": null,
+      "chuva_mm": 221.1,
+      "status_cota": "0",
+      "status_vazao": "",
+      "status_chuva": "0"
+    },
+    {
+      "data_hora_medicao": "2026-11-26 06:30:00",
+      "cota_cm": 221.1,
+      "vazao_m3s": null,
+      "chuva_mm": 221.1,
+      "status_cota": "0",
+      "status_vazao": "",
+      "status_chuva": "0"
+    },
+    {
+      "data_hora_medicao": "2026-11-26 06:45:00",
+      "cota_cm": 220.7,
+      "vazao_m3s": null,
+      "chuva_mm": 220.7,
       "status_cota": "0",
       "status_vazao": "",
       "status_chuva": "0"
